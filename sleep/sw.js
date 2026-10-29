@@ -1,7 +1,7 @@
 /* Cache first for the shell so the app opens instantly and works with no
    signal. The data is never cached here: it comes from the endpoint and is
    kept in localStorage instead, so a stale night never survives a refresh. */
-var SHELL = 'sleeplab-shell-v5895';
+var SHELL = 'sleeplab-shell-v33094';
 var FILES = ['./', './index.html', './manifest.webmanifest',
              './icon-192.png', './icon-512.png', './icon-180.png'];
 
