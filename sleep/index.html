@@ -1430,14 +1430,18 @@ renderAll();
 
 
 /* ---------------- data ----------------
-   The Artifact build read a Claude store. This one reads Trey's own endpoint,
-   which runs as him and already has access to the Drive folder the phone
-   writes into. Same `state` shape out the other end, so nothing below changed.
+   The Artifact build read a Claude store. This one reads a file sitting next
+   to the page, which is the fastest thing available: same origin, no round
+   trip to anyone, and the service worker can hold it.
 
-   The key is never in this file. The hosting repo is public, so a key in the
-   source would be a key anyone could read. It is typed once and kept in
-   localStorage on each device. */
-var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwwn6cORknm8METBNk_O_nQke0N7F_cMxZkgS-bfwRw5sfNUSrhValhYXzBOwb9q3XO/exec';
+   The hosting repo is PUBLIC, so that file is encrypted. AES-256-GCM, key
+   derived from the passphrase with PBKDF2-SHA256 at 200k iterations. The
+   passphrase is typed once per device and kept in localStorage. It is never
+   in this file, never sent anywhere, and a wrong one fails to decrypt rather
+   than quietly producing something wrong.
+
+   Same `state` shape out the other end, so nothing below here changed. */
+var DATA_URL = 'data.enc';
 var KEY_NAME = 'sleeplab.key';
 var CACHE_NAME = 'sleeplab.payload';
 
@@ -1457,6 +1461,34 @@ function cachePayload(p) {
   try { localStorage.setItem(CACHE_NAME, JSON.stringify(p)); } catch (e) { /* quota */ }
 }
 
+function b64bytes(s) {
+  var bin = atob(s), out = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+async function decryptPayload(pass, blob) {
+  var base = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  var key = await crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: b64bytes(blob.salt), iterations: blob.iter, hash: 'SHA-256' },
+    base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  var pt = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: b64bytes(blob.iv) }, key, b64bytes(blob.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+
+async function loadPayload(pass) {
+  var r = await fetch(DATA_URL, { cache: 'no-store' });
+  if (!r.ok) throw new Error('could not reach the data file, HTTP ' + r.status);
+  var blob = await r.json();
+  try {
+    return await decryptPayload(pass, blob);
+  } catch (e) {
+    throw new Error('that key does not open this data');
+  }
+}
+
 function applyPayload(p) {
   if (!p) return false;
   state.profiles = p.profiles || {};
@@ -1465,16 +1497,11 @@ function applyPayload(p) {
   state.queue = p.queue || [];
   state.loaded = { profiles: true, log: true, queue: true, history: true };
   renderAll();
+  var gen = el('freshness');
+  if (gen && p.generated) {
+    gen.textContent = 'Numbers as of ' + String(p.generated).replace('T', ' ').slice(0, 16);
+  }
   return true;
-}
-
-async function loadPayload(key) {
-  var url = ENDPOINT + '?summary=1&secret=' + encodeURIComponent(key);
-  var r = await fetch(url, { cache: 'no-store' });
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  var p = await r.json();
-  if (p && p.ok === false) throw new Error(p.error || 'refused');
-  return p;
 }
 
 function showGate(msg) {
@@ -1498,7 +1525,7 @@ el('gateGo').onclick = async function () {
     var p = await loadPayload(k);
     setKey(k); cachePayload(p); hideGate(); applyPayload(p);
   } catch (e) {
-    el('gateMsg').textContent = 'That key did not work. ' + e.message;
+    el('gateMsg').textContent = e.message;
   }
   el('gateGo').disabled = false;
 };
@@ -1515,7 +1542,7 @@ el('gateGo').onclick = async function () {
     cachePayload(p);
     applyPayload(p);
   } catch (e) {
-    if (!had) showGate('Could not reach your data. ' + e.message);
+    if (!had) showGate(e.message);
   }
 })();
 
