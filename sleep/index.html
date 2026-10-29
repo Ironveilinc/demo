@@ -1,0 +1,1531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Flores Sleep Lab</title>
+<meta name="description" content="Wake times scored against your own circadian trough.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#FBF4F2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sleep Lab">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root { padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px); }
+  html,body { margin:0; }
+  img { max-width:100%; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+
+<div id="gate" class="wrap" hidden style="padding-block:40px;max-width:420px">
+  <p class="eyebrow">One time on this device</p>
+  <h2 style="margin:0 0 6px;font-size:17.33px;letter-spacing:-0.012em">Enter your key</h2>
+  <p class="sub tight">This page is public, so the key that reaches your data is not in it.
+    Type it once and this device remembers it.</p>
+  <div class="field" style="margin-top:14px">
+    <label for="gateKey">Key</label>
+    <input type="password" id="gateKey" autocomplete="current-password" inputmode="text">
+  </div>
+  <div class="row-actions">
+    <button class="btn" id="gateGo">Unlock</button>
+    <span class="hint" id="gateMsg"></span>
+  </div>
+</div>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap">
+<title>Flores Sleep Lab</title>
+<style>
+/* Layout: one-screen app. Sticky header with the profile switch, four tabs,
+   a single scrolling panel under them. Phone first, widens to two columns.
+
+   ONE COLOUR. Trey asked for rose gold on its own, so there is no second hue
+   anywhere in the two rose skins. Where a second accent used to sit, the small
+   uppercase labels now take a QUIETER TINT OF THE SAME ROSE: hue 351 in every
+   case, saturation dropped from 34 to 16. That keeps the hierarchy a second
+   accent was giving without introducing a colour.
+
+   THE DARK SKIN USES THE IDENTICAL ROSE. The first build assumed rose gold had
+   to be lifted to survive a dark ground and shipped #EFBCAF, which measures as
+   salmon. That assumption was never tested. The real metal, #B76E79, reads 4.78
+   against this ground, comfortably over the 4.5 floor. So both rose skins carry
+   exactly the same accent and only the ground moves.
+
+   Brass is the third skin and keeps its steel, because that is the pairing he
+   approved. The olive block below it is kept but has no swatch: one button puts
+   it back.
+
+   SEVERITY IS NEVER CARRIED BY HUE ALONE. It cannot be on a rose page, since
+   every red that still reads as a warning sits within 4 degrees of rose gold.
+   It is carried by saturation instead, a vivid red against a dusty rose, and
+   the meter always has words beside it. Same resolution DOC_SYSTEM.md reached
+   for brass, which has no warning colour either. */
+:root {
+  /* Rose gold, light. One colour. --label is the same hue at half the
+     saturation, not a second accent. --ok is the rose itself. */
+  --ground:      #FBF4F2;
+  --raise:       #FFFFFF;
+  --surface:     #FFFFFF;
+  --surface-2:   #F6E9E6;
+  --line:        #EBD9D5;
+  --hairline:    #EEDFDB;
+  --ink:         #2A1E21;
+  --ink-max:     #1A1113;
+  --body:        #6B585C;
+  --dim:         #846E74;
+  --accent:      #B76E79;
+  --accent-deep: #9C5A66;
+  --accent-text: #9C5A66;   /* small text on the ground, 4.75 */
+  --numeral:     #B76E79;
+  --accent-2:    #886368;
+  --ok:          #B76E79;
+  --risk:        #8E2433;
+  --btn-a:       #9C5A66;
+  --btn-b:       #B76E79;
+  --btn-ink:     #FFFFFF;
+  --chip-on:     rgba(183, 110, 121, 0.14);
+  --glow-a:      rgba(183, 110, 121, 0.10);
+  --glow-b:      rgba(154, 122, 128, 0.07);
+  --card-shadow: 0 1px 2px rgba(42, 30, 33, 0.05);
+
+  --font:   'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --r: 16px;
+  color-scheme: light;
+}
+
+/* Rose gold, dark. Identical accent to the light skin, only the ground moves. */
+:root[data-skin="rosedark"] {
+  --ground:      #1A1416;
+  --raise:       #231B1D;
+  --surface:     rgba(255, 255, 255, 0.045);
+  --surface-2:   rgba(255, 255, 255, 0.080);
+  --line:        rgba(255, 255, 255, 0.100);
+  --hairline:    #2E2427;
+  --ink:         #F7EEF0;
+  --ink-max:     #FFFBFC;
+  --body:        #C3AEB3;
+  --dim:         #9A858A;
+  --accent:      #B76E79;
+  --accent-deep: #A05E69;
+  --accent-text: #B76E79;   /* small text on the ground, 4.78 */
+  --numeral:     #B76E79;
+  --accent-2:    #AE8F93;
+  --ok:          #B76E79;
+  --risk:        #E8637B;
+  --btn-a:       #A05E69;
+  --btn-b:       #B76E79;
+  --btn-ink:     #1A1416;
+  --chip-on:     rgba(183, 110, 121, 0.20);
+  --glow-a:      rgba(183, 110, 121, 0.14);
+  --glow-b:      rgba(120, 95, 100, 0.10);
+  --card-shadow: none;
+  color-scheme: dark;
+}
+
+/* Olive and dusty blue. Kept, but it has no swatch since he asked for rose
+   gold on its own. Adding its button back is a one line change. */
+:root[data-skin="olive"] {
+  --ground:      #F2F4EC;
+  --raise:       #FFFFFF;
+  --surface:     #FFFFFF;
+  --surface-2:   #E9EDDF;
+  --line:        #DFE4D4;
+  --hairline:    #DFE4D4;
+  --ink:         #23261B;
+  --ink-max:     #161810;
+  --body:        #5B6150;
+  --dim:         #707561;
+  --accent:      #6B7A3F;
+  --accent-deep: #55632F;
+  --accent-text: #55632F;   /* small text on the ground, 5.89 */
+  --numeral:     #6B7A3F;
+  --accent-2:    #42688C;
+  --ok:          #3F7F62;
+  --risk:        #A32338;
+  --btn-a:       #55632F;
+  --btn-b:       #6B7A3F;
+  --btn-ink:     #FFFFFF;
+  --chip-on:     rgba(107, 122, 63, 0.14);
+  --glow-a:      rgba(107, 122, 63, 0.09);
+  --glow-b:      rgba(66, 104, 140, 0.06);
+  --card-shadow: 0 1px 2px rgba(35, 38, 27, 0.05);
+  color-scheme: light;
+}
+
+/* Brass and steel, the Ironveil house palette. Dark, because brass is. */
+:root[data-skin="brass"] {
+  --ground:      #0F172A;
+  --raise:       #141E33;
+  --surface:     rgba(255, 255, 255, 0.045);
+  --surface-2:   rgba(255, 255, 255, 0.075);
+  --line:        rgba(255, 255, 255, 0.095);
+  --hairline:    #1E2B3F;
+  --ink:         #F0F3F8;
+  --ink-max:     #FBFCFE;
+  --body:        #94A3B8;
+  --dim:         #79899F;
+  --accent:      #E3B65C;
+  --accent-deep: #C9922F;
+  --accent-text: #E3B65C;   /* small text on the ground, 9.45 */
+  --numeral:     #D2A448;
+  --accent-2:    #9DB7D4;
+  --ok:          #6FB6A8;
+  --risk:        #E05A71;
+  --btn-a:       #C9922F;
+  --btn-b:       #E3B65C;
+  --btn-ink:     #0F172A;
+  --chip-on:     rgba(227, 182, 92, 0.14);
+  --glow-a:      rgba(79, 103, 125, 0.26);
+  --glow-b:      rgba(46, 74, 110, 0.20);
+  --card-shadow: none;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: 400 14px/1.5 var(--font);
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60em 40em at 12% -8%, var(--glow-a), transparent 62%),
+    radial-gradient(48em 34em at 96% 108%, var(--glow-b), transparent 60%);
+}
+.wrap { position: relative; max-width: 780px; margin: 0 auto; padding-inline: 16px; }
+
+/* ---- header ---- */
+header.app {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--hairline);
+}
+.head-row { display: flex; align-items: center; gap: 12px; padding-block: 14px 12px; flex-wrap: wrap; }
+.mark { display: flex; align-items: baseline; gap: 7px; margin-right: auto; min-width: 0; }
+.mark b { font-weight: 600; font-size: 15.33px; letter-spacing: -0.012em; color: var(--ink-max); }
+.mark i { font-family: var(--display); font-style: italic; font-size: 19px; color: var(--accent-deep); }
+.eyebrow {
+  font-size: 10.66px; font-weight: 600; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent-2);
+}
+
+/* ---- segmented controls ---- */
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button {
+  appearance: none; border: 0; background: none; color: var(--body);
+  font: 500 12.66px var(--font); padding: 6px 13px; border-radius: 999px;
+  cursor: pointer; white-space: nowrap;
+}
+.seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--ink-max); box-shadow: inset 0 0 0 1px var(--line); }
+.seg button:focus-visible, .tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.skins { display: flex; gap: 6px; align-items: center; }
+.skin {
+  appearance: none; cursor: pointer; padding: 0; width: 26px; height: 26px;
+  border-radius: 999px; border: 1px solid var(--line); background: none;
+  display: grid; place-items: center;
+}
+.skin > span { width: 17px; height: 17px; border-radius: 999px; display: block; }
+.skin[aria-pressed="true"] { border-color: var(--ink); }
+.skin:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Fixed hexes on purpose: a swatch has to show the colourway it switches to,
+   whichever one happens to be on. */
+#skinRose  > span { background: linear-gradient(135deg, #FBF4F2 50%, #B76E79 50%); }
+#skinDark  > span { background: linear-gradient(135deg, #1A1416 50%, #B76E79 50%); }
+#skinBrass > span { background: linear-gradient(135deg, #0F172A 50%, #E3B65C 50%); }
+.skinname { font-size: 11px; color: var(--dim); white-space: nowrap; }
+
+/* ---- one screen, no tabs ----
+   Everything lives on a single scroll in the order he needs it: the answer,
+   the controls that change it, the numbers, then the things he opens on
+   purpose. The three foldaways carry live data in their own summary line, so
+   the page still says what is inside them while they are shut. */
+.disclose {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); box-shadow: var(--card-shadow); overflow: hidden;
+}
+.disclose > summary {
+  cursor: pointer; list-style: none; padding: 14px 16px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.disclose > summary::-webkit-details-marker { display: none; }
+.disclose > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.disclose > summary .t {
+  font-weight: 600; font-size: 15.33px; letter-spacing: -0.012em; color: var(--ink);
+}
+.disclose > summary .s { font-size: 12.2px; color: var(--dim); margin-left: auto; text-align: right; }
+.disclose > summary .caret { color: var(--dim); font-size: 11px; transition: transform 0.15s ease; }
+.disclose[open] > summary .caret { transform: rotate(90deg); }
+.disclose[open] > summary { border-bottom: 1px solid var(--hairline); }
+.disclose .inner { padding: 16px; }
+
+/* the slim bar that appears only when this morning has not been logged */
+.nudge {
+  display: flex; width: 100%; align-items: center; gap: 10px; text-align: left;
+  appearance: none; cursor: pointer; font: 500 13.06px var(--font);
+  background: var(--chip-on); color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  border-radius: var(--r); padding: 12px 15px;
+}
+.nudge:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nudge .go { margin-left: auto; color: var(--accent-text); font-weight: 600; white-space: nowrap; }
+
+/* the always-visible numbers, tighter than the old tiles */
+.strip {
+  display: grid; gap: 1px; background: var(--hairline);
+  border: 1px solid var(--line); border-radius: var(--r); overflow: hidden;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+}
+.strip .cell { background: var(--raise); padding: 11px 13px; min-width: 0; }
+.strip .k {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--dim);
+}
+.strip .v {
+  font-family: var(--display); font-style: italic; font-size: 25px;
+  line-height: 1.15; color: var(--numeral); margin-top: 2px;
+}
+.strip .n { font-size: 10.5px; color: var(--body); line-height: 15px; margin-top: 1px; }
+
+/* the week, one row per calendar night including the ones the watch missed */
+.wk { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 1px;
+      background: var(--hairline); border-radius: 11px; overflow: hidden; }
+.wk li { background: var(--raise); padding: 10px 12px; display: grid; gap: 5px; }
+.wk li.off { opacity: 0.5; }
+.wk .r1 { display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap; }
+.wk .d { font-weight: 600; color: var(--ink); font-size: 13.06px; }
+.wk .t { color: var(--body); font-size: 12.4px; }
+.wk .h { margin-left: auto; font-family: var(--display); font-style: italic;
+         font-size: 21px; line-height: 1; color: var(--numeral); }
+.wk .r2 { display: flex; gap: 5px; flex-wrap: wrap; }
+.tag.good { border-color: var(--ok); color: var(--ok); }
+.tag.bad  { border-color: var(--risk); color: var(--risk); }
+
+/* the cause queue, one tappable row per night */
+.qrow { display: grid; gap: 7px; padding: 11px 0; border-top: 1px solid var(--hairline); }
+.qrow:first-of-type { border-top: 0; padding-top: 4px; }
+.qrow.done { opacity: 0.5; }
+
+/* ---- blocks ---- */
+main { padding-block: 16px 56px; display: grid; gap: 12px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 16px; box-shadow: var(--card-shadow);
+}
+.card > h2, .card > h3 {
+  margin: 0 0 3px; font-weight: 600; letter-spacing: -0.012em; color: var(--ink);
+}
+.card > h2 { font-size: 17.33px; line-height: 1.35; }
+.card > h3 { font-size: 15.33px; line-height: 21px; }
+.sub { color: var(--body); font-size: 13.06px; line-height: 21px; margin: 0; }
+.sub.tight { margin-bottom: 12px; }
+.hint { color: var(--dim); font-size: 11.5px; line-height: 17px; margin: 0; }
+
+/* ---- forms ---- */
+.fields { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-top: 12px; }
+.field { display: grid; gap: 5px; min-width: 0; }
+.field > label { font-size: 10.66px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); }
+input[type="time"], input[type="date"], input[type="text"], select, textarea {
+  width: 100%; background: var(--raise); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px;
+  font: 400 14px var(--font); font-variant-numeric: tabular-nums;
+}
+textarea { resize: vertical; min-height: 60px; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  appearance: none; cursor: pointer;
+  background: var(--raise); border: 1px solid var(--line); color: var(--body);
+  border-radius: 999px; padding: 7px 12px; font: 500 12.66px var(--font);
+}
+.chip[aria-pressed="true"] { border-color: var(--accent-deep); color: var(--ink-max); background: var(--chip-on); }
+.chip:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn {
+  appearance: none; cursor: pointer; border-radius: 10px; padding: 11px 18px;
+  font: 640 13.5px var(--font); font-weight: 600;
+  background: linear-gradient(120deg, var(--btn-a) 0%, var(--btn-b) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.22); color: var(--btn-ink);
+}
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+.btn.ghost { background: var(--surface); border-color: var(--line); color: var(--ink); font-weight: 500; }
+.row-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+/* ---- the recommendation ---- */
+.best {
+  border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+  background: linear-gradient(128deg,
+    color-mix(in srgb, var(--accent) 13%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 3%, transparent) 48%,
+    color-mix(in srgb, var(--accent) 9%, transparent) 100%);
+}
+.bigtime { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 4px 0 2px; }
+.bigtime .n { font-family: var(--display); font-style: italic; font-size: 52px; line-height: 1; color: var(--numeral); }
+.bigtime .u { color: var(--body); font-size: 13.06px; }
+.meter { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin-top: 10px; }
+.meter > i { display: block; height: 100%; border-radius: 99px; background: var(--ok); transition: width 0.25s ease; }
+.meter.mid > i { background: var(--body); }
+.meter.high > i { background: var(--risk); }
+.riskline { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 7px; }
+.riskline .word { font-size: 13.06px; font-weight: 600; color: var(--ink); }
+.riskline .num { font-size: 10.5px; color: var(--dim); }
+.flags { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.flags li { font-size: 12.66px; line-height: 19px; color: var(--body); padding-left: 11px; border-left: 2px solid var(--line); }
+.flags li.bad { border-left-color: var(--risk); color: var(--ink); }
+.flags li.warn { border-left-color: var(--accent-deep); border-left-style: dotted; }
+
+.alts { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 1px; background: var(--hairline); border-radius: 10px; overflow: hidden; }
+.alts li { display: grid; grid-template-columns: 62px 1fr auto; gap: 10px; align-items: center; background: var(--raise); padding: 10px 12px; }
+.alts .t { font-weight: 600; color: var(--ink); }
+.alts .d { font-size: 11.5px; color: var(--dim); min-width: 0; }
+.alts .r { font-size: 11.5px; color: var(--body); white-space: nowrap; }
+
+/* ---- stat tiles ---- */
+.stats { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); }
+.stat { background: var(--raise); border: 1px solid var(--line); border-radius: 11px; padding: 12px; min-width: 0; }
+.stat .k { font-size: 10.66px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+.stat .v { font-family: var(--display); font-style: italic; font-size: 30px; line-height: 1.1; color: var(--numeral); margin-top: 4px; }
+.stat .n { font-size: 11.5px; color: var(--body); line-height: 16px; margin-top: 3px; }
+
+/* ---- lists ---- */
+.nights { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 1px; background: var(--hairline); border-radius: 10px; overflow: hidden; }
+.nights li { background: var(--raise); padding: 11px 12px; display: grid; gap: 3px; }
+.nights .l1 { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.nights .date { font-weight: 600; color: var(--ink); font-size: 13.06px; }
+.nights .l2 { font-size: 11.5px; color: var(--dim); }
+.tag {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; color: var(--body);
+}
+.tag.free { border-color: var(--ok); color: var(--ok); }
+.tag.felt { border-color: var(--accent-2); color: var(--accent-2); }
+.tag.forced { border-style: dashed; border-color: var(--accent-deep); color: var(--accent); }
+.tag.open { border-color: var(--risk); color: var(--risk); }
+
+.queue { display: grid; gap: 10px; }
+.qcard { background: var(--raise); border: 1px solid var(--line); border-radius: 11px; padding: 13px; }
+.qcard.done { opacity: 0.55; }
+.qhead { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 4px; }
+.qhead .date { font-weight: 600; color: var(--ink); }
+.qsig { font-size: 11.5px; color: var(--dim); margin: 0 0 9px; }
+
+.note { border-left: 2px solid var(--accent-deep); padding: 2px 0 2px 12px; margin: 12px 0 0; font-size: 12.66px; line-height: 20px; color: var(--body); }
+.note.flat { border-left-color: var(--line); }
+.note.bad { border-left-color: var(--risk); color: var(--ink); }
+.empty { text-align: left; color: var(--body); font-size: 13.06px; line-height: 21px; }
+.ol { margin: 10px 0 0; padding-left: 20px; display: grid; gap: 7px; font-size: 13.06px; color: var(--body); line-height: 20px; }
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 40;
+  background: var(--raise); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 16px; font-size: 13px; color: var(--ink);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+footer.app { border-top: 1px solid var(--hairline); padding-block: 14px 24px; }
+footer.app p { margin: 0; font-size: 10px; color: var(--dim); text-align: right; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<header class="app">
+  <div class="wrap">
+    <div class="head-row">
+      <div class="mark"><b>Flores</b><i>Sleep</i><b>Lab</b></div>
+      <div class="seg" role="group" aria-label="Whose sleep">
+        <button id="pTrey" aria-pressed="true">Trey</button>
+        <button id="pAlissa" aria-pressed="false">Alissa</button>
+      </div>
+      <div class="skins" role="group" aria-label="Colour">
+        <button class="skin" id="skinRose" data-s="rose" aria-pressed="true" aria-label="Rose gold, light"><span></span></button>
+        <button class="skin" id="skinDark" data-s="rosedark" aria-pressed="false" aria-label="Rose gold, dark"><span></span></button>
+        <button class="skin" id="skinBrass" data-s="brass" aria-pressed="false" aria-label="Brass and steel"><span></span></button>
+        <span class="skinname" id="skinName">Rose gold, light</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- Appears only when this morning has no entry. Oura's one changing focal
+       point, cut down to the single thing that is actually waiting on him. -->
+  <button class="nudge" id="nudge" hidden>
+    <span id="nudgeText"></span><span class="go">Log it</span>
+  </button>
+
+  <!-- 1. THE ANSWER. Always first, always filled, never behind anything. -->
+  <section class="card best" id="answer" aria-live="polite"></section>
+
+  <!-- 2. The controls that change it, directly underneath, so the number
+          above moves while he is still looking at it. -->
+  <section class="card">
+    <div class="seg" role="group" aria-label="Which question">
+      <button id="modeWake" aria-pressed="true">I pick the wake time</button>
+      <button id="modeFixed" aria-pressed="false">The wake time is fixed</button>
+    </div>
+
+    <div id="freeFields">
+      <div class="fields">
+        <div class="field">
+          <label for="onsetTime">Asleep by</label>
+          <input type="time" id="onsetTime" value="23:15">
+        </div>
+        <div class="field">
+          <label for="onsetDay">Which night</label>
+          <select id="onsetDay">
+            <option value="0" selected>Tonight</option>
+            <option value="1">Tomorrow</option>
+            <option value="-1">Last night</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="shift">Shift after</label>
+          <select id="shift">
+            <option value="day" selected>Day</option>
+            <option value="overnight">Overnight</option>
+            <option value="evening">Evening</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="latest">Latest wake</label>
+          <input type="time" id="latest" placeholder="optional">
+        </div>
+      </div>
+    </div>
+
+    <div id="fixedFields" hidden>
+      <div class="fields">
+        <div class="field">
+          <label for="wakeTime">Must be up at</label>
+          <input type="time" id="wakeTime" value="04:30">
+        </div>
+        <div class="field">
+          <label for="wakeDay">Which morning</label>
+          <select id="wakeDay">
+            <option value="1" selected>Tomorrow</option>
+            <option value="0">Today</option>
+            <option value="2">Day after</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fixedShift">Shift after</label>
+          <select id="fixedShift">
+            <option value="day" selected>Day</option>
+            <option value="overnight">Overnight</option>
+            <option value="evening">Evening</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. The numbers. Six cells, always on screen, never a tap away. -->
+  <section class="strip" id="numbers" aria-label="Your measured numbers"></section>
+
+  <!-- 4. The week, every calendar night including the ones with no record. -->
+  <section class="card" id="week"></section>
+
+  <!-- 5. The one action that improves every number above it. Top three are
+          always showing, the rest folds. -->
+  <section class="card" id="queueCard"></section>
+
+  <!-- 5, 6, 7. Opened on purpose. Each summary carries live data so the page
+          still tells him what is inside while it is shut. -->
+  <details class="disclose" id="logBox">
+    <summary>
+      <span class="caret">&#9656;</span><span class="t">Log a night</span>
+      <span class="s" id="logSum"></span>
+    </summary>
+    <div class="inner">
+      <p class="sub tight">The watch records the times. This records the part it cannot
+        know, why the sleep ended and how you felt when it did.</p>
+      <div class="fields">
+        <div class="field">
+          <label for="logDate">Morning you woke</label>
+          <input type="date" id="logDate">
+        </div>
+        <div class="field">
+          <label for="logOnset">Fell asleep</label>
+          <input type="time" id="logOnset" value="23:30">
+        </div>
+        <div class="field">
+          <label for="logWake">Woke</label>
+          <input type="time" id="logWake" value="06:30">
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:14px">
+        <label>How it ended</label>
+        <div class="chips" id="endedChips">
+          <button class="chip" data-v="alarm" aria-pressed="true">Alarm</button>
+          <button class="chip" data-v="natural" aria-pressed="false">Woke on my own</button>
+          <button class="chip" data-v="woken" aria-pressed="false">Someone woke me</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:14px">
+        <label>Why you had to be up</label>
+        <div class="chips" id="reasonChips">
+          <button class="chip" data-v="work" aria-pressed="false">Work</button>
+          <button class="chip" data-v="swat" aria-pressed="false">SWAT</button>
+          <button class="chip" data-v="hunting" aria-pressed="false">Hunting</button>
+          <button class="chip" data-v="kids" aria-pressed="false">Kids</button>
+          <button class="chip" data-v="travel" aria-pressed="false">Travel</button>
+          <button class="chip" data-v="free" aria-pressed="false">Nothing, free morning</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:14px">
+        <label>How you felt waking</label>
+        <div class="chips" id="feltChips">
+          <button class="chip" data-v="1" aria-pressed="false">1 wrecked</button>
+          <button class="chip" data-v="2" aria-pressed="false">2 rough</button>
+          <button class="chip" data-v="3" aria-pressed="false">3 ok</button>
+          <button class="chip" data-v="4" aria-pressed="false">4 good</button>
+          <button class="chip" data-v="5" aria-pressed="false">5 sharp</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:14px">
+        <label for="logNotes">Anything worth remembering</label>
+        <textarea id="logNotes" placeholder="Woke at 3 and could not get back down. Kaleb up early."></textarea>
+      </div>
+
+      <div id="logReadout"></div>
+      <div class="row-actions">
+        <button class="btn" id="saveLog">Save this night</button>
+        <span class="hint" id="saveState"></span>
+      </div>
+
+      <div id="logList"></div>
+    </div>
+  </details>
+
+  <details class="disclose" id="lightBox">
+    <summary>
+      <span class="caret">&#9656;</span><span class="t">Light plan</span>
+      <span class="s" id="lightSum"></span>
+    </summary>
+    <div class="inner" id="light"></div>
+  </details>
+
+  <details class="disclose" id="recordBox">
+    <summary>
+      <span class="caret">&#9656;</span><span class="t">Your record</span>
+      <span class="s" id="recordSum"></span>
+    </summary>
+    <div class="inner" id="record"></div>
+  </details>
+
+</main>
+
+<footer class="app">
+  <div class="wrap"><p>Ironveil Inc.</p></div>
+</footer>
+
+<script>
+'use strict';
+
+/* ------------------------------------------------------------------ *
+ * Constants lifted from Sleep/engine/circadian.py. If the engine's
+ * constants move, move these with them or the app and the command
+ * line will disagree, which is worse than either being wrong alone.
+ * ------------------------------------------------------------------ */
+var ENG = {
+  MIN_TST: 360,            // 6h floor on a work day
+  MAX_TST: 570,            // 9h30 ceiling
+  TARGET_TST: 450,         // run.py --target default
+  MIN_H_AFTER_CBT: 1.5,
+  DEFAULT_CYCLE: 92        // population default until a real mean exists
+};
+
+/* A baseline nobody has measured yet. Deliberately generic, and labelled
+   as such on screen, so the planner works on first paint before the store
+   answers. Real values arrive from the db and override every field. */
+var GENERIC = {
+  cbtmin_h: null, cbtmin_uncertainty_h: null, cycle_min: null,
+  need_min: null, msf_sc_h: null, jetlag_h: null,
+  measured: false, episodes: 0
+};
+
+var PROFILES = { trey: 'Trey', alissa: 'Alissa' };
+var REASON_LABEL = {
+  work: 'Work', swat: 'SWAT', hunting: 'Hunting', kids: 'Kids',
+  travel: 'Travel', free: 'Free morning', other: 'Other'
+};
+
+var state = {
+  profile: 'trey',
+  mode: 'wake',
+  db: null,
+  canWrite: null,            // null = platform has not said
+  profiles: {},              // id -> {baseline, ...}
+  log: [],                   // logged nights, newest first
+  queue: [],                 // nights needing a cause
+  history: [],               // seeded record rows
+  loaded: { profiles: false, log: false, queue: false, history: false },
+  form: { ended: 'alarm', reason: null, felt: null }
+};
+
+/* ---------------- time helpers ---------------- */
+function pad(n) { return (n < 10 ? '0' : '') + n; }
+function clock(d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function hoursOf(d) { return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600; }
+function fmtH(h) {
+  if (h == null) return '--:--';
+  var x = ((h % 24) + 24) % 24;
+  var hh = Math.floor(x), mm = Math.round((x - hh) * 60);
+  if (mm === 60) { mm = 0; hh = (hh + 1) % 24; }
+  return pad(hh) + ':' + pad(mm);
+}
+function fmtMin(m) {
+  if (m == null) return '--';
+  var s = Math.round(m), h = Math.floor(s / 60);
+  return h + 'h' + pad(s - h * 60);
+}
+function isoDate(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function dayLabel(iso) {
+  var p = String(iso).split('-');
+  var d = new Date(+p[0], +p[1] - 1, +p[2]);
+  return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+}
+/* A time on a day offset from today. */
+function at(timeStr, dayOffset) {
+  if (!timeStr) return null;
+  var p = timeStr.split(':');
+  var d = new Date();
+  d.setDate(d.getDate() + (dayOffset || 0));
+  d.setHours(+p[0], +p[1], 0, 0);
+  return d;
+}
+function signedAfterCbt(wakeH, cbt) {
+  var a = (((wakeH - cbt) % 24) + 24) % 24;
+  return a > 12 ? a - 24 : a;
+}
+
+/* ---------------- the maths, ported from circadian.py ---------------- */
+function scoreWake(onset, b, latestWake) {
+  var cycle = b.cycle_min || ENG.DEFAULT_CYCLE;
+  var cbt = b.cbtmin_h;
+  var squeezed = false;
+
+  function boundaries(floor) {
+    var out = [];
+    for (var k = 1; k <= 12; k++) {
+      var tst = cycle * k;
+      if (tst > ENG.MAX_TST) break;
+      var wake = new Date(onset.getTime() + tst * 60000);
+      if (tst >= floor && (!latestWake || wake <= latestWake)) out.push({ k: k, tst: tst, wake: wake });
+    }
+    return out;
+  }
+
+  var cands = boundaries(ENG.MIN_TST);
+  if (!cands.length) { cands = boundaries(cycle); squeezed = true; }
+  if (!cands.length) {
+    if (latestWake && latestWake > onset) {
+      var tst = (latestWake - onset) / 60000;
+      return {
+        cycle: cycle, cbt: cbt, squeezed: true, all: [],
+        best: {
+          k: 0, tst: tst, wake: latestWake, afterCbt: null, score: 0, risk: 100,
+          flags: ['Only ' + (tst / 60).toFixed(1) + 'h available, less than one sleep cycle. Take all of it and expect to wake mid cycle.']
+        }
+      };
+    }
+    return { cycle: cycle, cbt: cbt, squeezed: false, all: [], best: null };
+  }
+
+  var scored = cands.map(function (c) {
+    var wakeH = hoursOf(c.wake), score = 100, flags = [], afterCbt = null;
+    if (cbt != null) {
+      afterCbt = signedAfterCbt(wakeH, cbt);
+      if (afterCbt < 0) {
+        score -= 45;
+        flags.push({ t: 'Before your temperature trough, the worst possible wake.', k: 'bad' });
+      } else if (afterCbt < ENG.MIN_H_AFTER_CBT) {
+        score -= 28 * (1 - afterCbt / ENG.MIN_H_AFTER_CBT);
+        flags.push({ t: 'Only ' + afterCbt.toFixed(1) + 'h past the trough.', k: 'warn' });
+      } else if (afterCbt > 7) {
+        score -= 10;
+        flags.push({ t: 'Well past the trough. Easy wake, but late.', k: '' });
+      }
+    }
+    score -= Math.min(Math.abs(c.tst - ENG.TARGET_TST) / 15, 25);
+    if (c.tst < 420) flags.push({ t: (c.tst / 60).toFixed(1) + 'h is short.', k: 'warn' });
+    if (squeezed) flags.push({ t: 'Window too tight for a full night. This is damage control.', k: 'warn' });
+    score = Math.max(score, 0);
+    return {
+      k: c.k, tst: c.tst, wake: c.wake, afterCbt: afterCbt, score: score,
+      risk: Math.max(0, Math.min(100, 100 - score)), flags: flags
+    };
+  });
+
+  scored.sort(function (x, y) { return y.score - x.score; });
+  return { cycle: cycle, cbt: cbt, squeezed: squeezed, all: scored, best: scored[0] };
+}
+
+function planBedtime(wake, b) {
+  var cycle = b.cycle_min || ENG.DEFAULT_CYCLE;
+  var target = b.need_min || ENG.TARGET_TST;
+  var cbt = b.cbtmin_h;
+  var options = [], best = null;
+
+  for (var k = 3; k <= 7; k++) {
+    var tst = cycle * k;
+    if (tst > ENG.MAX_TST) break;
+    var onset = new Date(wake.getTime() - tst * 60000);
+    var o = {
+      k: k, onset: onset, inBed: new Date(onset.getTime() - 20 * 60000),
+      tst: tst, shortfall: Math.max(0, target - tst)
+    };
+    options.push(o);
+    if (!best || Math.abs(o.tst - target) < Math.abs(best.tst - target)) best = o;
+  }
+
+  var warnings = [];
+  if (cbt != null) {
+    var after = signedAfterCbt(hoursOf(wake), cbt);
+    if (after < 0) {
+      warnings.push({
+        t: clock(wake) + ' is before your temperature trough (' + fmtH(cbt) + '). That is the single ' +
+           'worst point in the 24 hours to get up and no bedtime fixes it. Expect heavy grogginess for ' +
+           'the first hour whatever you do.', k: 'bad'
+      });
+    } else if (after < ENG.MIN_H_AFTER_CBT) {
+      warnings.push({
+        t: clock(wake) + ' is only ' + after.toFixed(1) + 'h past your trough (' + fmtH(cbt) +
+           '), still a rough point to wake.', k: 'warn'
+      });
+    }
+  }
+  if (best && best.shortfall > 45 && b.need_min) {
+    warnings.push({
+      t: 'Even at ' + (best.tst / 60).toFixed(1) + 'h you are ' + Math.round(best.shortfall) +
+         ' min short of what you sleep when nothing wakes you. Repeated across a week that ' +
+         'accumulates, so plan a recovery sleep rather than assuming it evens out.', k: 'warn'
+    });
+  }
+  return { options: options, best: best, warnings: warnings, cycle: cycle, cbt: cbt };
+}
+
+function lightPlan(b, shift) {
+  if (b.cbtmin_h == null) return ['Not enough nights yet to place your circadian trough.'];
+  var cbt = b.cbtmin_h;
+  var delayStart = fmtH(cbt - 6), trough = fmtH(cbt), advanceEnd = fmtH(cbt + 6);
+  var lines = [
+    'Trough (CBTmin) about ' + trough + '.',
+    'Light ' + delayStart + ' to ' + trough + ' pushes your clock later.',
+    'Light ' + trough + ' to ' + advanceEnd + ' pulls it earlier.'
+  ];
+  if (shift === 'overnight') {
+    lines.push('Going onto nights, you want it pushed later.');
+    lines.push('Get bright light early in the shift, from ' + delayStart + ' onward.');
+    lines.push('Wear sunglasses on the drive home at sunrise. That morning light is the single thing most likely to wreck your day sleep.');
+    lines.push('Blackout the bedroom. Even dim light in the advance zone fights you.');
+  } else if (shift === 'day' || shift === 'off') {
+    lines.push('Coming back to days, you want it pulled earlier.');
+    lines.push('Bright light as soon as you wake, inside the ' + trough + ' to ' + advanceEnd + ' window.');
+    lines.push('Keep lights low in the evening so you do not undo it.');
+    lines.push('Expect roughly 1h of phase shift per day. A 12h flip is not a one night job.');
+  } else if (shift === 'evening') {
+    lines.push('Evening shift is the mildest rotation, your clock barely has to move.');
+    lines.push('Protect the morning. Get outside before you go in.');
+  }
+  return lines;
+}
+
+/* ---------------- dom helpers ---------------- */
+function el(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+  });
+}
+function riskClass(r) { return r >= 45 ? 'high' : (r >= 22 ? 'mid' : ''); }
+function riskWord(r) { return r >= 45 ? 'Rough wake' : (r >= 22 ? 'Some grogginess' : 'Clean wake'); }
+function flagList(flags) {
+  if (!flags || !flags.length) return '';
+  return '<ul class="flags">' + flags.map(function (f) {
+    var t = typeof f === 'string' ? f : f.t, k = typeof f === 'string' ? '' : f.k;
+    return '<li class="' + k + '">' + esc(t) + '</li>';
+  }).join('') + '</ul>';
+}
+function baseline() {
+  var p = state.profiles[state.profile];
+  return (p && p.baseline) ? p.baseline : GENERIC;
+}
+function profileRow() { return state.profiles[state.profile] || {}; }
+function mine(list) {
+  return list.filter(function (n) { return n.profile === state.profile; });
+}
+function toast(msg) {
+  var t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function () { t.remove(); }, 2600);
+}
+function currentShift() {
+  return state.mode === 'fixed' ? el('fixedShift').value : el('shift').value;
+}
+
+/* ---------------- 1. the answer ---------------- */
+function renderAnswer() {
+  var b = baseline(), box = el('answer');
+
+  if (state.mode === 'fixed') {
+    var wake = at(el('wakeTime').value, +el('wakeDay').value);
+    if (!wake) { box.innerHTML = ''; return; }
+    var pl = planBedtime(wake, b);
+    var h = '<p class="eyebrow">Up at ' + esc(clock(wake)) + ' whatever happens</p>';
+    if (pl.best) {
+      h += '<div class="bigtime"><span class="n">' + esc(clock(pl.best.onset)) + '</span>' +
+           '<span class="u">asleep, so in bed by ' + esc(clock(pl.best.inBed)) + '</span></div>' +
+           '<p class="sub">' + (pl.best.tst / 60).toFixed(1) + 'h across ' + pl.best.k +
+           ' whole cycles of ' + Math.round(pl.cycle) + ' min' +
+           (pl.best.shortfall > 0 ? ', ' + Math.round(pl.best.shortfall) + ' min under what you need' : '') +
+           '.</p>';
+    }
+    h += flagList(pl.warnings);
+    if (pl.options.length > 1) {
+      h += '<ul class="alts">' + pl.options.map(function (o) {
+        return '<li><span class="t">' + esc(clock(o.onset)) + '</span>' +
+               '<span class="d">' + o.k + ' cycles, in bed ' + esc(clock(o.inBed)) + '</span>' +
+               '<span class="r">' + (o.tst / 60).toFixed(1) + 'h' +
+               (o.shortfall > 0 ? ', ' + Math.round(o.shortfall) + ' short' : '') + '</span></li>';
+      }).join('') + '</ul>';
+    }
+    if (!b.measured) h += notMeasuredNote();
+    box.innerHTML = h;
+    return;
+  }
+
+  var onset = at(el('onsetTime').value, +el('onsetDay').value);
+  if (!onset) { box.innerHTML = ''; return; }
+  var latestRaw = el('latest').value, latest = null;
+  if (latestRaw) {
+    latest = at(latestRaw, +el('onsetDay').value);
+    while (latest <= onset) latest = new Date(latest.getTime() + 86400000);
+  }
+
+  var r = scoreWake(onset, b, latest);
+  if (!r.best) {
+    box.innerHTML = '<p class="eyebrow">No whole cycle fits</p>' +
+      '<p class="sub">Nothing between ' + esc(clock(onset)) + ' and your latest wake is long ' +
+      'enough for one complete cycle. Move the latest wake, or accept waking mid cycle.</p>';
+    return;
+  }
+
+  var best = r.best, past = best.afterCbt;
+  var html = '<p class="eyebrow">Set the alarm for</p>' +
+    '<div class="bigtime"><span class="n">' + esc(clock(best.wake)) + '</span>' +
+    '<span class="u">' + (best.tst / 60).toFixed(1) + 'h, ' + best.k + ' cycles of ' +
+    Math.round(r.cycle) + ' min</span></div>';
+
+  if (past != null) {
+    html += '<p class="sub">' +
+      (past < 0
+        ? Math.abs(past).toFixed(1) + 'h <strong>before</strong> your body clock low point, ' + fmtH(r.cbt) + '.'
+        : past.toFixed(1) + 'h past your body clock low point, ' + fmtH(r.cbt) + '.') + '</p>';
+  }
+
+  /* The verdict is the word. The score is kept small on purpose: a watch is
+     only about 60% accurate on sleep stages against a lab, so a two digit
+     number here would claim a precision this cannot have. */
+  if (r.cbt != null) {
+    html += '<div class="meter ' + riskClass(best.risk) + '"><i style="width:' +
+      Math.max(3, Math.round(best.risk)) + '%"></i></div>' +
+      '<div class="riskline"><span class="word">' + riskWord(best.risk) + '</span>' +
+      '<span class="num">grogginess ' + Math.round(best.risk) + ' of 100</span></div>';
+  }
+  html += flagList(best.flags);
+
+  if (r.all.length > 1) {
+    html += '<ul class="alts">' + r.all.map(function (c) {
+      return '<li><span class="t">' + esc(clock(c.wake)) + '</span>' +
+        '<span class="d">' + c.k + ' cycles, ' + (c.tst / 60).toFixed(1) + 'h' +
+        (c.afterCbt != null
+          ? ', ' + (c.afterCbt < 0 ? 'before the low point' : c.afterCbt.toFixed(1) + 'h past it')
+          : '') +
+        '</span><span class="r">' + (r.cbt != null ? riskWord(c.risk) : (c.tst / 60).toFixed(1) + 'h') +
+        '</span></li>';
+    }).join('') + '</ul>';
+  }
+  if (!b.measured) html += notMeasuredNote();
+  html += '<p class="hint" style="margin-top:12px">Anywhere from ' +
+    esc(clock(new Date(best.wake.getTime() - 12 * 60000))) + ' to ' +
+    esc(clock(new Date(best.wake.getTime() + 12 * 60000))) + ' is the same wake.</p>';
+
+  box.innerHTML = html;
+}
+
+function notMeasuredNote() {
+  return '<p class="note bad">No body clock low point measured for ' +
+    esc(PROFILES[state.profile]) + ' yet. These are whole cycles off the 92 minute ' +
+    'population average and nothing more. Grogginess is left blank rather than guessed.</p>';
+}
+
+/* ---------------- 2. the numbers ---------------- */
+function renderNumbers() {
+  var b = baseline(), p = profileRow(), box = el('numbers');
+  if (!state.loaded.profiles) {
+    box.innerHTML = '<div class="cell" style="grid-column:1/-1"><div class="n">Loading your numbers.</div></div>';
+    return;
+  }
+  if (!b.measured) {
+    box.innerHTML = '<div class="cell" style="grid-column:1/-1">' +
+      '<div class="k">' + esc(PROFILES[state.profile]) + '</div>' +
+      '<div class="n" style="font-size:12.2px;margin-top:4px">No measured record yet. One Health ' +
+      'export off the watch fills this row in. Open Your record below for how.</div></div>';
+    return;
+  }
+  var c = p.cost || {};
+  var cov = (p.coverage && p.coverage.windows) ? p.coverage.windows['90'] : null;
+
+  /* Sleep owed is the last 14 CALENDAR days, not his last 14 recorded nights.
+     Those are not the same thing when the watch catches one night a week: the
+     recorded version reached back 108 days and was being labelled "the last
+     14 nights", which made it wrong by more than eight times. Worse, it read
+     highest exactly when wear was worst. Corrected 2026-10-26. */
+  var owed = (c.calendar_debt_min != null)
+    ? [fmtMin(c.calendar_debt_min),
+       'last 14 days, from ' + (c.calendar_window_nights || 0) + ' night' +
+       ((c.calendar_window_nights === 1) ? '' : 's') + ' on record']
+    : [fmtMin(c.rolling_debt_min), 'last ' + (c.rolling_window_nights || 0) + ' recorded nights'];
+
+  var cells = [
+    ['Low point', fmtH(b.cbtmin_h),
+     b.cbtmin_uncertainty_h ? 'CBTmin, give or take ' + b.cbtmin_uncertainty_h.toFixed(1) + 'h' : 'CBTmin'],
+    ['Your cycle', Math.round(b.cycle_min) + ' min', 'measured, not the folklore 90'],
+    ['You need', fmtMin(b.need_min), 'when nothing wakes you'],
+    ['Sleep owed', owed[0], owed[1]],
+    ['Mid sleep', fmtH(b.msf_sc_h), 'your natural middle, free days'],
+    ['Shift drag', (b.jetlag_h == null ? '--' : b.jetlag_h.toFixed(1) + 'h'), 'roster against biology']
+  ];
+
+  /* The binding constraint, and the one number the app never showed. Every
+     figure above it is computed from whatever nights the watch caught. */
+  if (cov) {
+    cells.push(['Nights worn', Math.round(cov.pct) + '%',
+                cov.nights + ' of the last ' + cov.days + ' nights']);
+  }
+  box.innerHTML = cells.map(function (t) {
+    return '<div class="cell"><div class="k">' + esc(t[0]) + '</div>' +
+      '<div class="v">' + esc(t[1]) + '</div><div class="n">' + esc(t[2]) + '</div></div>';
+  }).join('');
+}
+
+/* ---------------- 3. the week ---------------- */
+function fmtSigned(m) {
+  var a = Math.abs(Math.round(m));
+  return (m >= 0 ? '+' : '-') + (a >= 60 ? Math.floor(a / 60) + 'h' + String(a % 60).padStart(2, '0')
+                                         : a + ' min');
+}
+
+function renderWeek() {
+  var box = el('week');
+  if (!state.loaded.history) { box.innerHTML = '<p class="empty">Loading your nights.</p>'; return; }
+
+  var rows = mine(state.history).slice().sort(function (a, b) {
+    return a.date < b.date ? 1 : (a.date > b.date ? -1 : 0);
+  }).slice(0, 7);
+
+  if (!rows.length) {
+    box.innerHTML = '<p class="eyebrow">Last 7 nights</p>' +
+      '<p class="sub">Nothing yet. Once the watch data starts flowing every night shows up here, ' +
+      'including the ones it missed.</p>';
+    return;
+  }
+
+  var on = rows.filter(function (r) { return r.watch_on !== false; });
+
+  var h = '<p class="eyebrow">Last 7 nights</p>' +
+    '<h3 style="margin:0 0 3px">' + on.length + ' of ' + rows.length + ' recorded</h3>' +
+    '<p class="sub">Every calendar night, including the ones the watch missed. A night with no ' +
+    'record is the one thing holding every number above this back.</p>';
+
+  h += '<ul class="wk">' + rows.map(function (r) {
+    if (r.watch_on === false) {
+      return '<li class="off"><div class="r1"><span class="d">' + esc(dayLabel(r.date)) +
+        '</span><span class="t">watch was off, nothing recorded</span></div></li>';
+    }
+    var tags = [];
+    if (r.vs_need_min != null) {
+      tags.push('<span class="tag ' + (r.vs_need_min >= 0 ? 'good' : '') + '">' +
+        esc(fmtSigned(r.vs_need_min)) + ' vs need</span>');
+    }
+    if (r.past_trough_h != null) {
+      tags.push('<span class="tag ' + (r.past_trough_h < 0 ? 'bad' : '') + '">' +
+        (r.past_trough_h < 0
+          ? Math.abs(r.past_trough_h).toFixed(1) + 'h before your low point'
+          : r.past_trough_h.toFixed(1) + 'h past it') + '</span>');
+    }
+    if (r.deep_min) tags.push('<span class="tag">deep ' + fmtMin(r.deep_min) + '</span>');
+    if (r.rem_min) tags.push('<span class="tag">rem ' + fmtMin(r.rem_min) + '</span>');
+    if (r.class && r.class !== 'night_sleep') {
+      tags.push('<span class="tag felt">' + esc(r.class.replace(/_/g, ' ')) + '</span>');
+    }
+
+    return '<li><div class="r1"><span class="d">' + esc(dayLabel(r.date)) + '</span>' +
+      '<span class="t">' + esc((r.onset_clock || '--') + ' to ' + (r.wake_clock || '--')) + '</span>' +
+      '<span class="h">' + fmtMin(r.slept_min) + '</span></div>' +
+      (tags.length ? '<div class="r2">' + tags.join('') + '</div>' : '') + '</li>';
+  }).join('') + '</ul>';
+
+  var slept = on.filter(function (r) { return r.slept_min; });
+  if (slept.length) {
+    var mean = slept.reduce(function (a, r) { return a + r.slept_min; }, 0) / slept.length;
+    var debt = slept.reduce(function (a, r) { return a + (r.debt_min || 0); }, 0);
+    h += '<p class="hint" style="margin-top:11px">Mean ' + fmtMin(mean) + ' across the nights it ' +
+      'caught, and ' + fmtMin(debt) + ' of debt built up over these ' + rows.length + ' days.</p>';
+  }
+  box.innerHTML = h;
+}
+
+/* ---------------- 4. the cause queue ---------------- */
+function queueRow(q) {
+  var woke = q.woke ? new Date(q.woke) : null;
+  return '<div class="qrow' + (q.reason ? ' done' : '') + '">' +
+    '<div class="qhead"><span class="date">' + esc(dayLabel(q.date)) + '</span>' +
+    (woke ? '<span class="qsig" style="margin:0">woke ' + esc(clock(woke)) +
+      ', slept ' + fmtMin(q.slept_min) + '</span>' : '') +
+    '<span class="tag ' + (q.reason ? (q.reason === 'free' ? 'free' : 'forced') : 'open') + '">' +
+    esc(q.reason ? REASON_LABEL[q.reason] || q.reason : 'no reason yet') + '</span></div>' +
+    (q.signals && q.signals.length
+      ? '<p class="qsig">' + esc(q.signals.join('. ')) + '.</p>' : '') +
+    '<div class="chips" data-date="' + esc(q.date) + '">' +
+    ['work', 'swat', 'hunting', 'kids', 'travel', 'free'].map(function (rr) {
+      return '<button class="chip qreason" data-r="' + rr + '" aria-pressed="' +
+        (q.reason === rr) + '">' + esc(REASON_LABEL[rr]) + '</button>';
+    }).join('') + '</div></div>';
+}
+
+function renderQueue() {
+  var all = mine(state.queue), box = el('queueCard');
+  if (!state.loaded.queue) { box.innerHTML = '<p class="empty">Loading.</p>'; return; }
+
+  var open = all.filter(function (q) { return !q.reason; });
+  var done = all.length - open.length;
+
+  if (!all.length) {
+    box.innerHTML = '<p class="eyebrow">Why you woke</p>' +
+      '<p class="sub">Nothing waiting. Once this profile has a watch record, any night that ' +
+      'looks cut short with no explanation shows up here.</p>';
+    return;
+  }
+
+  var head = '<p class="eyebrow">Why you woke</p>' +
+    '<h3 style="margin:0 0 3px">' + open.length + ' night' + (open.length === 1 ? '' : 's') +
+    ' still need a reason</h3>' +
+    '<p class="sub tight">Only nights where nothing woke you can measure your biology. Every ' +
+    'free night in your record was guessed from the shape of the sleep, not told to us, which ' +
+    'is why your low point is marked provisional. A few taps here fixes that.' +
+    (done ? ' ' + done + ' done so far.' : '') + '</p>';
+
+  var first = (open.length ? open : all).slice(0, 3);
+  var rest = (open.length ? open : all).slice(3);
+
+  var body = first.map(queueRow).join('');
+  if (rest.length) {
+    body += '<details style="margin-top:10px"><summary class="hint" style="cursor:pointer">' +
+      rest.length + ' more waiting</summary><div style="margin-top:6px">' +
+      rest.map(queueRow).join('') + '</div></details>';
+  }
+  box.innerHTML = head + body;
+}
+
+/* ---------------- 4. log ---------------- */
+function logReadout() {
+  var b = baseline(), dateStr = el('logDate').value;
+  if (!dateStr) { el('logReadout').innerHTML = ''; return null; }
+  var parts = dateStr.split('-');
+  var wake = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+  var wp = el('logWake').value.split(':');
+  wake.setHours(+wp[0], +wp[1], 0, 0);
+
+  var onset = new Date(wake);
+  var op = el('logOnset').value.split(':');
+  onset.setHours(+op[0], +op[1], 0, 0);
+  if (onset >= wake) onset.setDate(onset.getDate() - 1);
+
+  var mins = (wake - onset) / 60000;
+  var midH = hoursOf(new Date(onset.getTime() + (mins / 2) * 60000));
+  var short = b.need_min ? b.need_min - mins : null;
+  var after = b.cbtmin_h == null ? null : signedAfterCbt(hoursOf(wake), b.cbtmin_h);
+
+  var bits = [fmtMin(mins) + ' asleep', 'middle of the night ' + fmtH(midH)];
+  if (short != null) bits.push(short > 0 ? Math.round(short) + ' min under what you need' : 'at or over what you need');
+  var h = '<p class="note flat">' + esc(bits.join(', ')) + '.</p>';
+  if (after != null && after < 0) {
+    h += '<p class="note bad">That wake was ' + Math.abs(after).toFixed(1) +
+         'h before your low point of ' + fmtH(b.cbtmin_h) +
+         '. The grogginess was not a discipline problem.</p>';
+  }
+  el('logReadout').innerHTML = h;
+  return { onset: onset, wake: wake, mins: mins, midH: midH };
+}
+
+function renderLog() {
+  var rows = mine(state.log);
+  el('logSum').textContent = !state.loaded.log ? ''
+    : (rows.length ? 'last ' + dayLabel(rows[0].date) + ', ' + rows.length + ' logged'
+                   : 'nothing logged yet');
+
+  if (!rows.length) {
+    el('logList').innerHTML = '';
+    return;
+  }
+  el('logList').innerHTML = '<p class="eyebrow" style="margin-top:18px">Already logged</p>' +
+    '<ul class="nights">' + rows.slice(0, 10).map(function (n) {
+      var tagK = n.reason === 'free' ? 'free' : (n.reason ? 'forced' : '');
+      return '<li><div class="l1"><span class="date">' + esc(dayLabel(n.date)) + '</span>' +
+        '<span class="tag ' + tagK + '">' + esc(REASON_LABEL[n.reason] || 'no reason') + '</span>' +
+        (n.felt ? '<span class="tag felt">felt ' + esc(n.felt) + ' of 5</span>' : '') + '</div>' +
+        '<div class="l2">' + esc(n.onset_clock + ' to ' + n.wake_clock) + ', ' + fmtMin(n.minutes) +
+        ', ended ' + esc(n.ended) + (n.notes ? '. ' + esc(n.notes) : '') + '</div></li>';
+    }).join('') + '</ul>';
+}
+
+function renderNudge() {
+  var today = isoDate(new Date());
+  var has = mine(state.log).some(function (n) { return n.date === today; });
+  var show = state.loaded.log && !has && new Date().getHours() >= 4;
+  el('nudge').hidden = !show;
+  if (show) el('nudgeText').textContent = 'This morning is not logged yet.';
+}
+
+/* ---------------- 5. light ---------------- */
+function renderLight() {
+  var b = baseline(), shift = currentShift();
+  var lines = lightPlan(b, shift);
+  el('lightSum').textContent = b.cbtmin_h == null ? 'needs more nights'
+    : 'after a ' + shift + ' shift';
+  el('light').innerHTML = '<ul class="flags">' +
+    lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') +
+    '</ul><p class="hint" style="margin-top:10px">Light is the only thing that actually moves ' +
+    'your body clock. Sleep timing on its own does not.</p>';
+}
+
+/* ---------------- 6. record ---------------- */
+function renderRecord() {
+  var p = profileRow(), b = baseline(), box = el('record');
+  if (!state.loaded.profiles) { el('recordSum').textContent = ''; box.innerHTML = '<p class="empty">Loading.</p>'; return; }
+
+  if (!b.measured) {
+    el('recordSum').textContent = 'no watch data yet';
+    box.innerHTML = '<p class="sub">A low point, a sleep need and a chronotype cannot be ' +
+      'computed from nothing. Three weeks of nights is the minimum, and a Health export is ' +
+      'instant because the watch has already recorded them.</p>' +
+      '<ol class="ol"><li>Health app, tap your photo top right, Export All Health Data.</li>' +
+      '<li>It builds a zip. AirDrop it to the computer.</li>' +
+      '<li>Say where it landed and these numbers appear.</li></ol>' +
+      '<p class="note">Logging nights above in the meantime is not wasted. Those are the ' +
+      'confirmed causes the watch can never supply.</p>';
+    return;
+  }
+
+  el('recordSum').textContent = (p.episodes || 0) + ' sleeps, ' +
+    (p.first_night || '').slice(0, 7) + ' to ' + (p.last_night || '').slice(0, 7);
+
+  var rough = b.cbtmin_h == null ? null : fmtH(b.cbtmin_h + ENG.MIN_H_AFTER_CBT);
+  var h = '';
+  if (rough) {
+    h += '<p class="note">Waking before ' + esc(rough) + ' is physically rough for you and no ' +
+         'bedtime fixes it. That is the number to argue with when someone sets an 04:30 start.</p>';
+  }
+  if (b.cbtmin_via) {
+    h += '<p class="hint" style="margin-top:12px">Your low point is estimated two independent ' +
+      'ways: ' + Object.keys(b.cbtmin_via).map(function (k) {
+        return esc(k.replace(/_/g, ' ')) + ' says ' + fmtH(b.cbtmin_via[k]);
+      }).join(', ') + '. The gap between them is the honest uncertainty. Apple only stores one ' +
+      'wrist temperature per night, not a curve, so neither can be checked directly.</p>';
+  }
+  if (b.provisional) {
+    h += '<p class="note">Marked provisional. All ' + (b.free_nights || 0) + ' free nights were ' +
+         'worked out from the shape of the sleep, none confirmed. The queue above is what fixes it.</p>';
+  }
+
+  var hist = mine(state.history);
+  if (hist.length) {
+    h += '<p class="eyebrow" style="margin-top:18px">Last ' + hist.length + ' sleeps on the watch</p>' +
+      '<ul class="nights">' + hist.slice(0, 30).map(function (n) {
+        var k = n.forced === true ? 'forced' : (n.reason === 'likely_free' ? 'free' : '');
+        return '<li><div class="l1"><span class="date">' + esc(dayLabel(n.date)) + '</span>' +
+          '<span class="tag ' + k + '">' + esc(String(n.reason || 'unknown').replace(/_/g, ' ')) + '</span>' +
+          '<span class="l2" style="color:var(--body)">' + fmtMin(n.slept_min) + '</span></div>' +
+          '<div class="l2">' + esc(String(n.class || '').replace(/_/g, ' ')) +
+          (n.onset ? ', ' + esc(clock(new Date(n.onset)) + ' to ' + clock(new Date(n.wake))) : '') +
+          (n.debt_min ? ', ' + Math.round(n.debt_min) + ' min short' : '') +
+          (n.truncation ? ', looks cut short' : '') + '</div></li>';
+      }).join('') + '</ul>';
+  }
+  box.innerHTML = h;
+}
+
+function renderAll() {
+  renderAnswer(); renderNumbers(); renderWeek(); renderQueue();
+  logReadout(); renderLog(); renderNudge(); renderLight(); renderRecord();
+}
+
+/* ---------------- writes ---------------- */
+function writeBlocked() {
+  if (state.canWrite === false) { toast('This view is read only. Ask Trey for Contributor access.'); return true; }
+  if (!state.db) { toast('Not connected yet. Try again in a moment.'); return true; }
+  return false;
+}
+
+async function saveLog() {
+  if (writeBlocked()) return;
+  var r = logReadout();
+  if (!r) { toast('Pick the morning you woke first.'); return; }
+  var date = el('logDate').value;
+  var body = {
+    profile: state.profile, date: date,
+    onset: r.onset.toISOString(), wake: r.wake.toISOString(),
+    onset_clock: clock(r.onset), wake_clock: clock(r.wake),
+    minutes: Math.round(r.mins), mid_sleep_h: Math.round(r.midH * 100) / 100,
+    ended: state.form.ended, reason: state.form.reason,
+    felt: state.form.felt ? +state.form.felt : null,
+    notes: el('logNotes').value.trim(),
+    source: 'app', saved_at: new Date().toISOString()
+  };
+  el('saveLog').disabled = true;
+  el('saveState').textContent = 'Saving.';
+  try {
+    await state.db.doc('log/' + state.profile + '__' + date).set(body);
+    el('saveState').textContent = 'Saved ' + dayLabel(date) + '.';
+    el('logNotes').value = '';
+    toast('Logged ' + dayLabel(date) + '.');
+  } catch (e) {
+    if (e && e.code === 'invalid_argument') {
+      state.canWrite = false;
+      el('saveState').textContent = 'This view cannot write. Read only from here.';
+    } else {
+      el('saveState').textContent = 'Did not save. ' + ((e && e.message) || 'Try again.');
+    }
+  }
+  el('saveLog').disabled = false;
+}
+
+async function tagCause(date, reason) {
+  if (writeBlocked()) return;
+  var id = state.profile + '__' + date, found = null;
+  for (var i = 0; i < state.queue.length; i++) {
+    if (state.queue[i].id === id) { found = state.queue[i]; break; }
+  }
+  var body = Object.assign({}, found || { profile: state.profile, date: date }, {
+    reason: reason, tagged_at: new Date().toISOString(), status: 'tagged'
+  });
+  delete body.id;
+  try {
+    await state.db.doc('queue/' + id).set(body);
+    toast(dayLabel(date) + ' tagged ' + (REASON_LABEL[reason] || reason) + '.');
+  } catch (e) {
+    if (e && e.code === 'invalid_argument') { state.canWrite = false; toast('This view is read only.'); }
+    else toast('Did not save that tag.');
+  }
+}
+
+/* ---------------- wiring ---------------- */
+/* Which colourway each of them prefers is a per viewer convenience, so it
+   lives in browser storage and never reaches the shared store. Both accessors
+   can throw in a private window, hence the try. */
+var SKINS = { rose: 'Rose gold, light', rosedark: 'Rose gold, dark',
+              brass: 'Brass and steel', olive: 'Olive and dusty blue' };
+function setSkin(sk) {
+  if (!SKINS[sk]) sk = 'rose';
+  document.documentElement.setAttribute('data-skin', sk);
+  ['Rose', 'Dark', 'Brass'].forEach(function (k) {
+    var b = el('skin' + k);
+    if (b) b.setAttribute('aria-pressed', String(b.dataset.s === sk));
+  });
+  el('skinName').textContent = SKINS[sk];
+  try { localStorage.setItem('sleeplab.skin', sk); } catch (e) { /* private window */ }
+}
+function setProfile(pr) {
+  state.profile = pr;
+  el('pTrey').setAttribute('aria-pressed', String(pr === 'trey'));
+  el('pAlissa').setAttribute('aria-pressed', String(pr === 'alissa'));
+  renderAll();
+}
+function setMode(m) {
+  state.mode = m;
+  el('modeWake').setAttribute('aria-pressed', String(m === 'wake'));
+  el('modeFixed').setAttribute('aria-pressed', String(m === 'fixed'));
+  el('freeFields').hidden = (m !== 'wake');
+  el('fixedFields').hidden = (m === 'wake');
+  renderAnswer(); renderLight();
+}
+function wireChips(groupId, key) {
+  el(groupId).addEventListener('click', function (ev) {
+    var b = ev.target.closest('.chip');
+    if (!b) return;
+    var on = b.getAttribute('aria-pressed') === 'true';
+    Array.prototype.forEach.call(this.querySelectorAll('.chip'), function (c) {
+      c.setAttribute('aria-pressed', 'false');
+    });
+    if (!on) { b.setAttribute('aria-pressed', 'true'); state.form[key] = b.dataset.v; }
+    else state.form[key] = (key === 'ended') ? 'alarm' : null;
+    if (key === 'ended' && !on) state.form.ended = b.dataset.v;
+  });
+}
+
+['Rose', 'Dark', 'Brass'].forEach(function (k) {
+  el('skin' + k).onclick = function () { setSkin(this.dataset.s); };
+});
+var savedSkin = null;
+try { savedSkin = localStorage.getItem('sleeplab.skin'); } catch (e) { savedSkin = null; }
+setSkin(savedSkin || 'rose');
+
+el('pTrey').onclick = function () { setProfile('trey'); };
+el('pAlissa').onclick = function () { setProfile('alissa'); };
+el('modeWake').onclick = function () { setMode('wake'); };
+el('modeFixed').onclick = function () { setMode('fixed'); };
+
+['onsetTime', 'onsetDay', 'shift', 'latest', 'wakeTime', 'wakeDay', 'fixedShift'].forEach(function (id) {
+  el(id).addEventListener('input', function () { renderAnswer(); renderLight(); });
+  el(id).addEventListener('change', function () { renderAnswer(); renderLight(); });
+});
+['logDate', 'logOnset', 'logWake'].forEach(function (id) {
+  el(id).addEventListener('input', logReadout);
+  el(id).addEventListener('change', logReadout);
+});
+wireChips('endedChips', 'ended');
+wireChips('reasonChips', 'reason');
+wireChips('feltChips', 'felt');
+el('saveLog').disabled = true;
+el('saveState').textContent = 'Logging by hand is off in this version.';
+
+el('queueCard').addEventListener('click', function (ev) {
+  var b = ev.target.closest('.qreason');
+  if (!b) return;
+  tagCause(b.parentElement.dataset.date, b.dataset.r);
+});
+
+el('nudge').onclick = function () {
+  el('logBox').open = true;
+  el('logBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+el('logDate').value = isoDate(new Date());
+setMode('wake');
+renderAll();
+
+
+/* ---------------- data ----------------
+   The Artifact build read a Claude store. This one reads Trey's own endpoint,
+   which runs as him and already has access to the Drive folder the phone
+   writes into. Same `state` shape out the other end, so nothing below changed.
+
+   The key is never in this file. The hosting repo is public, so a key in the
+   source would be a key anyone could read. It is typed once and kept in
+   localStorage on each device. */
+var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwwn6cORknm8METBNk_O_nQke0N7F_cMxZkgS-bfwRw5sfNUSrhValhYXzBOwb9q3XO/exec';
+var KEY_NAME = 'sleeplab.key';
+var CACHE_NAME = 'sleeplab.payload';
+
+function getKey() {
+  try { return localStorage.getItem(KEY_NAME) || ''; } catch (e) { return ''; }
+}
+function setKey(k) {
+  try { localStorage.setItem(KEY_NAME, k); } catch (e) { /* private window */ }
+}
+function cachedPayload() {
+  try {
+    var raw = localStorage.getItem(CACHE_NAME);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function cachePayload(p) {
+  try { localStorage.setItem(CACHE_NAME, JSON.stringify(p)); } catch (e) { /* quota */ }
+}
+
+function applyPayload(p) {
+  if (!p) return false;
+  state.profiles = p.profiles || {};
+  state.history = p.history || [];
+  state.log = p.log || [];
+  state.queue = p.queue || [];
+  state.loaded = { profiles: true, log: true, queue: true, history: true };
+  renderAll();
+  return true;
+}
+
+async function loadPayload(key) {
+  var url = ENDPOINT + '?summary=1&secret=' + encodeURIComponent(key);
+  var r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  var p = await r.json();
+  if (p && p.ok === false) throw new Error(p.error || 'refused');
+  return p;
+}
+
+function showGate(msg) {
+  el('gate').hidden = false;
+  document.querySelector('main').hidden = true;
+  document.querySelector('header.app').hidden = true;
+  if (msg) el('gateMsg').textContent = msg;
+}
+function hideGate() {
+  el('gate').hidden = true;
+  document.querySelector('main').hidden = false;
+  document.querySelector('header.app').hidden = false;
+}
+
+el('gateGo').onclick = async function () {
+  var k = el('gateKey').value.trim();
+  if (!k) { el('gateMsg').textContent = 'Type the key first.'; return; }
+  el('gateGo').disabled = true;
+  el('gateMsg').textContent = 'Checking.';
+  try {
+    var p = await loadPayload(k);
+    setKey(k); cachePayload(p); hideGate(); applyPayload(p);
+  } catch (e) {
+    el('gateMsg').textContent = 'That key did not work. ' + e.message;
+  }
+  el('gateGo').disabled = false;
+};
+
+(async function boot() {
+  /* Paint from the last known numbers first, then go and get fresh ones. That
+     is what makes it open instantly instead of showing a spinner. */
+  var had = applyPayload(cachedPayload());
+  var key = getKey();
+  if (!key) { showGate(''); return; }
+  hideGate();
+  try {
+    var p = await loadPayload(key);
+    cachePayload(p);
+    applyPayload(p);
+  } catch (e) {
+    if (!had) showGate('Could not reach your data. ' + e.message);
+  }
+})();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () { /* offline */ });
+  });
+}
+
+</script>
+
+</body>
+</html>
