@@ -1422,30 +1422,40 @@ function shiftOn(offset) {
   return s.days[isoDate(d)] || null;
 }
 
+/* The full picture for a morning: what it is, when he has to be up, and
+   whether anything is pinning it at all. SWAT school and hunting are not
+   work, and they get him up earlier than work does. */
+function dayDetail(offset) {
+  var s = state.payload && state.payload.shifts;
+  if (!s || !s.detail) return null;
+  var d = new Date();
+  d.setDate(d.getDate() + offset);
+  return s.detail[isoDate(d)] || null;
+}
+
 /* The app should already know. If tomorrow is a work day it opens on the
    bedtime question with the wake pinned, instead of making him set it. */
 function applyRoster() {
-  var tom = shiftOn(1), tod = shiftOn(0), r = routine();
+  var tom = dayDetail(1), r = routine();
   var note = el('presetNote');
   if (!tom) { if (note) note.textContent = ''; return; }
 
-  if (tom === 'work') {
+  if (tom.forced && tom.target_wake) {
     setMode('fixed');
-    el('wakeTime').value = r.target_wake;
+    el('wakeTime').value = tom.target_wake;
     el('wakeDay').value = '1';
     el('fixedShift').value = 'day';
     el('presetWork').setAttribute('aria-pressed', 'true');
     el('presetOff').setAttribute('aria-pressed', 'false');
-    note.textContent = 'You work tomorrow, ' + r.work_start + ' to ' + r.work_end +
-      '. Out the door by ' + r.leave_home + '.' +
-      (tod === 'work' ? ' Second of two.' : '');
+    note.textContent = tom.label + ' tomorrow, up at ' + tom.target_wake +
+      (tom.kind === 'work' ? '. Out the door by ' + r.leave_home + '.' : '.');
   } else {
     setMode('wake');
     el('shift').value = 'off';
     el('presetOff').setAttribute('aria-pressed', 'true');
     el('presetWork').setAttribute('aria-pressed', 'false');
-    note.textContent = 'Off tomorrow. Nothing pinning your morning, so this is ' +
-      'the kind of night that can actually measure you.';
+    note.textContent = 'Nothing pinning tomorrow morning. This is the kind of ' +
+      'night that can actually measure you, so no alarm if you can help it.';
   }
   renderAnswer(); renderLight();
 }
