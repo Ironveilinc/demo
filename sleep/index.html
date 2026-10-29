@@ -478,6 +478,12 @@ footer.app p { margin: 0; font-size: 10px; color: var(--dim); text-align: right;
       <button id="modeFixed" aria-pressed="false">The wake time is fixed</button>
     </div>
 
+    <div class="chips" id="presets" style="margin-top:12px">
+      <button class="chip" id="presetWork">Work tomorrow</button>
+      <button class="chip" id="presetOff">Day off</button>
+    </div>
+    <p class="hint" id="presetNote" style="margin-top:8px"></p>
+
     <div id="freeFields">
       <div class="fields">
         <div class="field">
@@ -1396,6 +1402,36 @@ setSkin(savedSkin || 'rose');
 
 el('pTrey').onclick = function () { setProfile('trey'); };
 el('pAlissa').onclick = function () { setProfile('alissa'); };
+/* One tap for the shift he actually works. The times ride along in the payload
+   rather than being typed in here, so there is one place to change them. */
+function routine() {
+  var p = state.payload && state.payload.routine;
+  return p || { work_start: '07:00', work_end: '19:00',
+                leave_home: '06:25', target_wake: '06:00' };
+}
+
+el('presetWork').onclick = function () {
+  var r = routine();
+  setMode('fixed');
+  el('wakeTime').value = r.target_wake;
+  el('wakeDay').value = '1';
+  el('fixedShift').value = 'day';
+  el('presetNote').textContent =
+    'Up at ' + r.target_wake + ', out the door by ' + r.leave_home +
+    ', on shift ' + r.work_start + ' to ' + r.work_end + '.';
+  renderAnswer(); renderLight();
+  el('answer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+el('presetOff').onclick = function () {
+  setMode('wake');
+  el('onsetDay').value = '0';
+  el('shift').value = 'off';
+  el('presetNote').textContent =
+    'Nothing pinning your morning, so this is the kind of night that can measure you.';
+  renderAnswer(); renderLight();
+};
+
 el('modeWake').onclick = function () { setMode('wake'); };
 el('modeFixed').onclick = function () { setMode('fixed'); };
 
@@ -1491,6 +1527,7 @@ async function loadPayload(pass) {
 
 function applyPayload(p) {
   if (!p) return false;
+  state.payload = p;
   state.profiles = p.profiles || {};
   state.history = p.history || [];
   state.log = p.log || [];
