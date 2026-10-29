@@ -1286,6 +1286,7 @@ function renderRecord() {
 }
 
 function renderAll() {
+  applyRoster();
   renderAnswer(); renderNumbers(); renderWeek(); renderQueue();
   logReadout(); renderLog(); renderNudge(); renderLight(); renderRecord();
 }
@@ -1405,9 +1406,48 @@ el('pAlissa').onclick = function () { setProfile('alissa'); };
 /* One tap for the shift he actually works. The times ride along in the payload
    rather than being typed in here, so there is one place to change them. */
 function routine() {
+  var s = state.payload && state.payload.shifts;
   var p = state.payload && state.payload.routine;
-  return p || { work_start: '07:00', work_end: '19:00',
-                leave_home: '06:25', target_wake: '06:00' };
+  return s || p || { work_start: '07:00', work_end: '19:00',
+                     leave_home: '06:25', target_wake: '06:00' };
+}
+
+/* offset 0 is today, 1 tomorrow. Returns 'work', 'off', or null if the roster
+   does not reach that far. */
+function shiftOn(offset) {
+  var s = state.payload && state.payload.shifts;
+  if (!s || !s.days) return null;
+  var d = new Date();
+  d.setDate(d.getDate() + offset);
+  return s.days[isoDate(d)] || null;
+}
+
+/* The app should already know. If tomorrow is a work day it opens on the
+   bedtime question with the wake pinned, instead of making him set it. */
+function applyRoster() {
+  var tom = shiftOn(1), tod = shiftOn(0), r = routine();
+  var note = el('presetNote');
+  if (!tom) { if (note) note.textContent = ''; return; }
+
+  if (tom === 'work') {
+    setMode('fixed');
+    el('wakeTime').value = r.target_wake;
+    el('wakeDay').value = '1';
+    el('fixedShift').value = 'day';
+    el('presetWork').setAttribute('aria-pressed', 'true');
+    el('presetOff').setAttribute('aria-pressed', 'false');
+    note.textContent = 'You work tomorrow, ' + r.work_start + ' to ' + r.work_end +
+      '. Out the door by ' + r.leave_home + '.' +
+      (tod === 'work' ? ' Second of two.' : '');
+  } else {
+    setMode('wake');
+    el('shift').value = 'off';
+    el('presetOff').setAttribute('aria-pressed', 'true');
+    el('presetWork').setAttribute('aria-pressed', 'false');
+    note.textContent = 'Off tomorrow. Nothing pinning your morning, so this is ' +
+      'the kind of night that can actually measure you.';
+  }
+  renderAnswer(); renderLight();
 }
 
 el('presetWork').onclick = function () {
