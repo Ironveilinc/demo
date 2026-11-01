@@ -316,6 +316,9 @@ header.app {
 .wk .r2 { display: flex; gap: 5px; flex-wrap: wrap; }
 .tag.good { border-color: var(--ok); color: var(--ok); }
 .tag.bad  { border-color: var(--risk); color: var(--risk); }
+/* Marks a sleep total that is what the watch measured rather than what he
+   slept, so the number is never read as a flat fact. */
+.qm { color: var(--risk); font-weight: 600; margin-left: 2px; }
 
 /* the cause queue, one tappable row per night */
 .qrow { display: grid; gap: 7px; padding: 11px 0; border-top: 1px solid var(--hairline); }
@@ -1085,22 +1088,47 @@ function renderWeek() {
     }
     if (r.deep_min) tags.push('<span class="tag">deep ' + fmtMin(r.deep_min) + '</span>');
     if (r.rem_min) tags.push('<span class="tag">rem ' + fmtMin(r.rem_min) + '</span>');
+    /* A night the watch only half saw. Its sleep total is what the watch SAW,
+       not what he slept, so saying "4h47, 2h24 short" about a night with a
+       184 minute blackout in it reports a hardware fault as a sleep deficit.
+       The hole gets named instead, and vs-need is absent by then because the
+       payload leaves it null. */
+    if (r.partly_measured) {
+      tags.push('<span class="tag bad">only ' + Math.round(r.measured_pct) +
+        '% measured</span>');
+      if (r.biggest_gap_min >= 20 && r.gap_from) {
+        tags.push('<span class="tag">nothing recorded ' + esc(r.gap_from) +
+          ' to ' + esc(r.gap_to) + '</span>');
+      }
+    }
     if (r.class && r.class !== 'night_sleep') {
       tags.push('<span class="tag felt">' + esc(r.class.replace(/_/g, ' ')) + '</span>');
     }
 
     return '<li><div class="r1"><span class="d">' + esc(dayLabel(r.date)) + '</span>' +
       '<span class="t">' + esc((r.onset_clock || '--') + ' to ' + (r.wake_clock || '--')) + '</span>' +
-      '<span class="h">' + fmtMin(r.slept_min) + '</span></div>' +
+      '<span class="h">' + fmtMin(r.slept_min) +
+      (r.partly_measured ? '<span class="qm" title="measured, not slept">?</span>' : '') +
+      '</span></div>' +
       (tags.length ? '<div class="r2">' + tags.join('') + '</div>' : '') + '</li>';
   }).join('') + '</ul>';
 
-  var slept = on.filter(function (r) { return r.slept_min; });
-  if (slept.length) {
-    var mean = slept.reduce(function (a, r) { return a + r.slept_min; }, 0) / slept.length;
-    var debt = slept.reduce(function (a, r) { return a + (r.debt_min || 0); }, 0);
-    h += '<p class="hint" style="margin-top:11px">Mean ' + fmtMin(mean) + ' across the nights it ' +
-      'caught, and ' + fmtMin(debt) + ' of debt built up over these ' + rows.length + ' days.</p>';
+  /* Means and debt come only from nights measured well enough to mean
+     something. A 61% night dragged the mean down and added two hours of debt
+     that never happened. */
+  var full = on.filter(function (r) { return r.slept_min && !r.partly_measured; });
+  var thin = on.filter(function (r) { return r.partly_measured; });
+  if (full.length) {
+    var mean = full.reduce(function (a, r) { return a + r.slept_min; }, 0) / full.length;
+    var debt = full.reduce(function (a, r) { return a + (r.debt_min || 0); }, 0);
+    h += '<p class="hint" style="margin-top:11px">Mean ' + fmtMin(mean) + ' across the ' +
+      full.length + ' night' + (full.length === 1 ? '' : 's') + ' it measured properly, and ' +
+      fmtMin(debt) + ' of debt over these ' + rows.length + ' days.' +
+      (thin.length
+        ? ' ' + thin.length + ' night' + (thin.length === 1 ? '' : 's') + ' left out of both, ' +
+          'because the watch missed too much of ' + (thin.length === 1 ? 'it' : 'them') +
+          ' to call the total a sleep figure.'
+        : '') + '</p>';
   }
   box.innerHTML = h;
 }
@@ -1116,11 +1144,16 @@ function queueRow(q) {
     esc(q.reason ? REASON_LABEL[q.reason] || q.reason : 'no reason yet') + '</span></div>' +
     (q.signals && q.signals.length
       ? '<p class="qsig">' + esc(q.signals.join('. ')) + '.</p>' : '') +
-    '<div class="chips" data-date="' + esc(q.date) + '">' +
-    ['work', 'swat', 'hunting', 'kids', 'travel', 'free'].map(function (rr) {
-      return '<button class="chip qreason" data-r="' + rr + '" aria-pressed="' +
-        (q.reason === rr) + '">' + esc(REASON_LABEL[rr]) + '</button>';
-    }).join('') + '</div></div>';
+    /* Chips only where a tap can actually land. In the standalone app
+       state.db was the Artifact's store and nothing replaced it, so these
+       reported "Not connected yet. Try again in a moment" forever. A control
+       that cannot work is worse than no control. */
+    (state.canWrite === false ? '' :
+      '<div class="chips" data-date="' + esc(q.date) + '">' +
+      ['work', 'swat', 'hunting', 'kids', 'travel', 'free'].map(function (rr) {
+        return '<button class="chip qreason" data-r="' + rr + '" aria-pressed="' +
+          (q.reason === rr) + '">' + esc(REASON_LABEL[rr]) + '</button>';
+      }).join('') + '</div>') + '</div>';
 }
 
 function renderQueue() {
@@ -1137,13 +1170,28 @@ function renderQueue() {
     return;
   }
 
+  /* The copy here used to say every free night was guessed and the low point
+     was provisional. That stopped being true on 2026-10-30, when the first
+     confirmed morning landed, so it is read off the data now instead of being
+     asserted. */
+  var b = baseline() || {}, conf = b.confirmed_free_nights;
+  var state2 = b.provisional
+    ? 'Every free night in your record was guessed from the shape of the sleep, not told ' +
+      'to us, which is why your low point is still marked provisional.'
+    : 'Your low point is no longer provisional, because ' +
+      (conf ? conf + ' night' + (conf === 1 ? ' has' : 's have') : 'at least one night has') +
+      ' been confirmed rather than guessed. More confirmed nights tighten it further.';
+
   var head = '<p class="eyebrow">Why you woke</p>' +
     '<h3 style="margin:0 0 3px">' + open.length + ' night' + (open.length === 1 ? '' : 's') +
     ' still need a reason</h3>' +
-    '<p class="sub tight">Only nights where nothing woke you can measure your biology. Every ' +
-    'free night in your record was guessed from the shape of the sleep, not told to us, which ' +
-    'is why your low point is marked provisional. A few taps here fixes that.' +
-    (done ? ' ' + done + ' done so far.' : '') + '</p>';
+    '<p class="sub tight">Only nights where nothing woke you can measure your biology. ' +
+    state2 + (done ? ' ' + done + ' already have a guess against them.' : '') + '</p>' +
+    (state.canWrite === false
+      ? '<p class="hint" style="margin:0 0 9px">This is a read only view, so the buttons ' +
+        'below are off. Tell Trey the date and the reason, or run ' +
+        '<code>run.py --tag YYYY-MM-DD=free</code> on the PC.</p>'
+      : '');
 
   var first = (open.length ? open : all).slice(0, 3);
   var rest = (open.length ? open : all).slice(3);
@@ -1212,7 +1260,11 @@ function renderLog() {
 function renderNudge() {
   var today = isoDate(new Date());
   var has = mine(state.log).some(function (n) { return n.date === today; });
-  var show = state.loaded.log && !has && new Date().getHours() >= 4;
+  /* Never nudge toward something that cannot be saved. The log is always
+     empty in the standalone app, so without the canWrite check this prompted
+     him to "Log it" every single day and the save had nowhere to go. */
+  var show = state.canWrite !== false && state.loaded.log && !has &&
+             new Date().getHours() >= 4;
   el('nudge').hidden = !show;
   if (show) el('nudgeText').textContent = 'This morning is not logged yet.';
 }
@@ -1582,6 +1634,20 @@ function applyPayload(p) {
   state.history = p.history || [];
   state.log = p.log || [];
   state.queue = p.queue || [];
+  /* The standalone app has no store behind it: state.db was the Claude
+     Artifact's and nothing replaced it when the app moved to its own URL.
+     Saying so up front is what stops the reason chips and "Save this night"
+     from sitting there promising to work. */
+  state.canWrite = (p.can_write === undefined) ? false : !!p.can_write;
+  /* Only the SAVE goes away. The rest of that panel is a calculator - type a
+     night and it tells you where the wake landed against your trough - and
+     that works fine without anywhere to write to. */
+  var sv = el('saveLog');
+  if (sv && !state.canWrite) {
+    sv.hidden = true;
+    var st = el('saveState');
+    if (st) st.textContent = 'Saving is off in this view. Works out the night either way.';
+  }
   state.loaded = { profiles: true, log: true, queue: true, history: true };
   renderAll();
   var gen = el('freshness');
