@@ -1586,7 +1586,18 @@ function recoveryLine(rec) {
     return (a.earned / a.weight) - (b.earned / b.weight);
   });
   if (!parts.length) return '';
-  if (rec.partial) return 'Measured on part of the picture only. ' + parts[0].detail + '.';
+  /* Name what is missing rather than saying "part of the picture". Early in
+     the morning the day's resting heart rate or HRV may not have landed
+     yet, and which one is absent is the useful half of that sentence. */
+  if (rec.partial) {
+    var have = parts.map(function (p) { return p.key; });
+    var want = [['rhr', 'resting heart rate'], ['hrv', 'HRV'],
+                ['sleep', 'last night'], ['debt', 'sleep owed']];
+    var gone = want.filter(function (w) { return have.indexOf(w[0]) === -1; })
+                   .map(function (w) { return w[1]; });
+    return (gone.length ? 'No ' + gone.join(' or ') + ' yet today, so this is ' +
+            'scored on the rest. ' : '') + parts[0].detail + '.';
+  }
   return parts[0].detail + '.';
 }
 
@@ -3189,11 +3200,11 @@ function applyPayload(p) {
     if (st) st.textContent = 'Saving is off in this view. Works out the night either way.';
   }
   state.loaded = { profiles: true, log: true, queue: true, history: true };
+  /* renderAll fills the freshness line itself, separator and all. This used
+     to write it a SECOND time right here, with different wording and no
+     separator, so the live footer read "Ironveil Inc.Numbers as of ...".
+     Two writers for one element, and the later one won. */
   renderAll();
-  var gen = el('freshness');
-  if (gen && p.generated) {
-    gen.textContent = 'Numbers as of ' + String(p.generated).replace('T', ' ').slice(0, 16);
-  }
   return true;
 }
 
