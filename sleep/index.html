@@ -1657,16 +1657,24 @@ function applyPayload(p) {
   return true;
 }
 
+/* Everything except the gate itself goes away, nav and footer included.
+   Leaving the tab bar on screen behind a locked page offers five views
+   that cannot be opened. */
+var CHROME = ['main', 'header.app', 'nav.tabs', 'footer.app'];
+function chrome(hide) {
+  CHROME.forEach(function (sel) {
+    var n = document.querySelector(sel);
+    if (n) n.hidden = hide;
+  });
+}
 function showGate(msg) {
   el('gate').hidden = false;
-  document.querySelector('main').hidden = true;
-  document.querySelector('header.app').hidden = true;
+  chrome(true);
   if (msg) el('gateMsg').textContent = msg;
 }
 function hideGate() {
   el('gate').hidden = true;
-  document.querySelector('main').hidden = false;
-  document.querySelector('header.app').hidden = false;
+  chrome(false);
 }
 
 el('gateGo').onclick = async function () {
