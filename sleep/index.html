@@ -1041,6 +1041,8 @@ var state = {
   view: 'today',
   db: null,
   canWrite: null,            // null = platform has not said
+  fetchFailed: null,         // the reason, when the screen is this phone's saved copy
+  fetching: false,           // true while a fetch is in the air
   payload: null,
   profiles: {},
   log: [],
@@ -1073,6 +1075,190 @@ function dayLabel(iso) {
   var d = new Date(+p[0], +p[1] - 1, +p[2]);
   return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
 }
+
+/* ---------------- which nights have not arrived yet ----------------
+   Added 2026-11-11. He opened this at 05:46 after sleeping 8h53 and the
+   newest night on screen was the one before, 5h58, sitting in the top row
+   exactly as last night would have. Nothing was miscalculated. The phone
+   had not sent the night yet, and the page had no way to say so, so a
+   stale night and a current one looked identical.
+
+   A night is dated by the morning it ended. So once that morning has come,
+   a record with no row for it is not "the watch was off", it is "not in
+   yet", and those two get different words.
+
+   Pure, and `now` is passed in, so check_fresh.js can run it against fixed
+   clocks. It sits above the dom helpers for that reason. */
+var NIGHT_EXPECTED_FROM_H = 4;
+
+function expectedDay(now) {
+  /* The newest date a finished night could carry. Before 04:00 the night
+     that will be dated today is still being slept, the same line the
+     morning nudge already draws. */
+  var d = new Date(now.getTime());
+  if (d.getHours() < NIGHT_EXPECTED_FROM_H) d.setDate(d.getDate() - 1);
+  return isoDate(d);
+}
+
+function emptyToday(rows, now) {
+  /* Today's day file is in and holds no sleep. That is a THIRD thing, and
+     it is neither of the other two. It is not "not in yet", because the
+     phone has plainly sent today. And it is not "the watch was off",
+     because that file is rewritten by every upload until the day ends, and
+     a night can still turn up in it.
+
+     The first cut of this folded it into "not in yet", and a fresh-eyes
+     review caught what that printed: "nothing from Wed is in yet, and what
+     the phone sent stops at 05:10 Wed", both off the same file. And on a
+     night the watch really was off it would have gone on saying the phone
+     had not sent, all day, while the phone sent every few hours.
+
+     Only once the morning has come. At 00:30 an empty file for today is
+     just a day that has not been slept yet. */
+  var today = isoDate(now);
+  if (expectedDay(now) !== today) return false;
+  return rows.some(function (r) { return r.date === today && r.watch_on === false; });
+}
+
+function pendingDays(rows, now) {
+  /* Dates, newest first, of nights the record cannot speak for yet, meaning
+     no day file for them has arrived at all. Empty when there is no record,
+     because then nothing is late. Capped at a week so a PC that was off for
+     a month does not fill the screen. */
+  var newest = null;
+  rows.forEach(function (r) {
+    if (!newest || r.date > newest) newest = r.date;
+  });
+  if (!newest) return [];
+  var p = expectedDay(now).split('-');
+  var d = new Date(+p[0], +p[1] - 1, +p[2]);
+  var out = [];
+  for (var i = 0; i < 7; i++) {
+    var iso = isoDate(d);
+    if (iso <= newest) break;
+    out.push(iso);
+    d.setDate(d.getDate() - 1);
+  }
+  return out;
+}
+
+/* refresh.ps1 rebuilds at least every four hours while the PC is up. Numbers
+   older than this were therefore not left that way by a PC that is running. */
+var PC_LATE_AFTER_H = 5;
+
+function holdUp(now, builtIso, fetchFailed, fetching) {
+  /* Which link the page is waiting on, as far as it can tell. It matters
+     because the first version of the note blamed the phone every time, and
+     on the day it was written the PC had also been sitting at a sign-in
+     screen for 19 hours after an update restart.
+       'checking' a fetch is in the air, so the screen is the saved copy and
+                  nobody gets blamed off numbers that are about to change
+       'offline'  this phone could not fetch, so the screen is its saved copy
+       'pc'       the numbers are older than a running PC ever leaves them
+       'phone'    the PC is current, so what is missing has not left the phone
+       'unknown'  no build time to judge by, so no link gets blamed */
+  if (fetching) return 'checking';
+  if (fetchFailed) return 'offline';
+  var b = builtIso ? new Date(builtIso) : null;
+  if (!b || isNaN(b.getTime())) return 'unknown';
+  return (now.getTime() - b.getTime()) > PC_LATE_AFTER_H * 3600000 ? 'pc' : 'phone';
+}
+
+function staleWords(o) {
+  /* The words for the note at the top of Today, as plain text, or null when
+     there is nothing to say. Kept apart from the DOM so check_fresh.js can
+     hold every sentence to the situation it is printed in. Three of the
+     review's findings were sentences that were true in one situation and
+     printed in another.
+
+       o.late        how many nights have no day file yet
+       o.capped      true when that count hit the cap, so it is "at least"
+       o.lateLabel   the newest of them, as "Wed, Nov 11"
+       o.emptyToday  today's file is in and has no sleep in it
+       o.why         from holdUp
+       o.built, o.sent, o.through   clocks already in words, or null
+       o.reason      why the fetch failed, when it did */
+  var late = o.late || 0;
+  if (!late && !o.emptyToday && o.why !== 'offline') return null;
+
+  var lead;
+  if (late === 1) {
+    lead = 'Nothing from ' + o.lateLabel + ' is in yet.';
+  } else if (late > 1) {
+    /* Naming only the newest one read as if the nights before it had
+       arrived. With the PC off for two days it said "nothing from Thu"
+       above a Tuesday. */
+    lead = (o.capped ? 'At least the last ' : 'The last ') + late + ' nights are not in yet.';
+  } else if (o.emptyToday) {
+    lead = 'No sleep in what your phone has sent today.';
+  } else {
+    lead = 'Could not refresh just now.';
+  }
+
+  var body = (late || o.emptyToday) ? 'The night below is the newest one scored.' : '';
+  function add(s) { body += (body ? ' ' : '') + s; }
+
+  if (o.why === 'checking') {
+    add('Checking for newer numbers now.');
+  } else if (o.why === 'offline') {
+    add('This phone could not refresh' + (o.reason ? ' (' + o.reason + ')' : '') +
+      ', so what is on screen is the copy it saved last time' +
+      (o.built ? ', built ' + o.built : '') + '.');
+  } else if (o.why === 'pc') {
+    /* Do not blame the phone for this one. A PC that is running rebuilds at
+       least every four hours, so numbers this old mean it is off or stuck,
+       and it has no idea what the phone has or has not sent since. */
+    add('The PC built these numbers at ' + o.built + ' and has not published since. ' +
+      'It does that at least every four hours while it is running, so the PC is off ' +
+      'or stuck, and it cannot tell whether your phone has sent anything.');
+  } else if (late) {
+    /* "As of", because that is all the page knows: what the phone had sent
+       the last time the PC built. */
+    if (o.sent) {
+      add((o.built ? 'As of ' + o.built + ' your' : 'Your') + ' phone had last sent data at ' +
+        o.sent + (o.through ? ', and what it sent stops at ' + o.through : '') + '.');
+    } else if (o.through) {
+      add('What the phone has sent stops at ' + o.through + '.');
+    }
+    add('It lands after Health Auto Export next runs with the phone unlocked.');
+  } else {
+    /* Today's file is in with no sleep. Say where it stops and nothing
+       about why, because the page cannot know why. */
+    if (o.through) add('What it sent stops at ' + o.through + '.');
+    add('If the watch was on your wrist, the night should come with a later send.');
+  }
+  return { lead: lead, body: body };
+}
+
+function lateWords(why) {
+  /* The chip on a night with no day file. It only names the phone when the
+     phone is the link actually being waited on. */
+  if (why === 'phone') return 'not in from the phone yet';
+  if (why === 'checking') return 'not in yet, checking now';
+  return 'not in yet';
+}
+
+function offWords(row, now) {
+  /* A day file with no sleep in it. Final once the day is over. On its own
+     date it is still being rewritten, so it gets words that can be true
+     whichever way it turns out. */
+  return row.date === isoDate(now)
+    ? 'phone has sent today, no sleep in it so far'
+    : 'watch was off, nothing recorded';
+}
+
+function stamp(iso, now) {
+  /* "05:14 Wed". Past six days back a weekday alone is ambiguous, so it
+     grows a date. Converted to this device's clock, because the Drive stamp
+     arrives in UTC and the sample stamp arrives with the phone's offset. */
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return String(iso);
+  var far = Math.abs(now.getTime() - d.getTime()) > 6 * 86400000;
+  return clock(d) + ' ' + d.toLocaleDateString(undefined, far
+    ? { weekday: 'short', day: 'numeric', month: 'short' }
+    : { weekday: 'short' });
+}
+
 /* A time on a day offset from today. */
 function at(timeStr, dayOffset) {
   if (!timeStr) return null;
@@ -1531,6 +1717,10 @@ function renderScore() {
       '<p class="sub">No night in the record was measured well enough to score. The week on the ' +
       'Nights screen says which, and why.</p>';
   } else {
+    /* First thing on the screen when it applies, because everything under
+       it is about a night that is not the one he just slept. */
+    h += staleNote();
+    var recStale = rec.day && rec.day !== isoDate(new Date());
     h += '<div class="scorerow">' +
       '<div class="sc hero"><p class="eyebrow">' + esc(dayLabel(ln.date)) + '</p>' +
       '<div class="scoreline">' + arc(ln.score, 76, scoreClass(ln.score)) +
@@ -1548,7 +1738,11 @@ function renderScore() {
         '<div><div class="big">' + Math.round(rec.score) + '</div>' +
         '<div class="of">of 100</div></div></div>' +
         '<div class="word" style="margin-top:7px;font-size:15.33px">' + esc(rec.band) + '</div>' +
-        '<p class="hint">' + esc(recoveryLine(rec)) + '</p>';
+        /* Recovery is built off the newest day the phone has sent. When
+           that is not today it says which day, instead of standing under
+           a heading that reads as this morning. */
+        '<p class="hint">' + esc((recStale ? 'As of ' + dayLabel(rec.day) + '. ' : '') +
+          recoveryLine(rec, recStale)) + '</p>';
     }
     h += '</div></div>';
   }
@@ -1561,6 +1755,44 @@ function renderScore() {
   }
   box.innerHTML = h;
   renderWorking();
+}
+
+function freshState() {
+  /* Everything the stale-night wording needs, gathered once, so Today and
+     Nights cannot disagree about which link is being waited on. They did:
+     Today said the PC was off while Nights went on blaming the phone. */
+  var now = new Date();
+  var rows = mine(state.history);
+  var fr = pay('freshness') || {};
+  var built = fr.built || (state.payload && state.payload.generated) || null;
+  return {
+    now: now, rows: rows, fr: fr, built: built,
+    pend: pendingDays(rows, now),
+    empty: emptyToday(rows, now),
+    why: holdUp(now, built, state.fetchFailed, state.fetching)
+  };
+}
+
+function staleNote() {
+  /* Says the newest night on screen is not the newest night there is, and
+     which link that is waiting on. Every clock comes from the payload. A
+     clock that did not arrive is left out, not filled in. The wording
+     itself lives in staleWords, where the gate can reach it. */
+  var f = freshState();
+  var w = staleWords({
+    late: f.pend.length,
+    capped: f.pend.length >= 7,
+    lateLabel: f.pend.length ? dayLabel(f.pend[0]) : null,
+    emptyToday: f.empty,
+    why: f.why,
+    built: f.built ? stamp(f.built, f.now) : null,
+    sent: f.fr.phone_sent ? stamp(f.fr.phone_sent, f.now) : null,
+    through: f.fr.data_through ? stamp(f.fr.data_through, f.now) : null,
+    reason: state.fetchFailed || null
+  });
+  if (!w) return '';
+  return '<p class="note bad" style="margin:0 0 14px"><b>' + esc(w.lead) + '</b>' +
+    (w.body ? ' ' + esc(w.body) : '') + '</p>';
 }
 
 function restfulLine(ln) {
@@ -1581,7 +1813,7 @@ function restfulLine(ln) {
   return worst.label + ' is what held it back. ' + worst.detail + '.';
 }
 
-function recoveryLine(rec) {
+function recoveryLine(rec, stale) {
   var parts = (rec.parts || []).slice().sort(function (a, b) {
     return (a.earned / a.weight) - (b.earned / b.weight);
   });
@@ -1595,7 +1827,10 @@ function recoveryLine(rec) {
                 ['sleep', 'last night'], ['debt', 'sleep owed']];
     var gone = want.filter(function (w) { return have.indexOf(w[0]) === -1; })
                    .map(function (w) { return w[1]; });
-    return (gone.length ? 'No ' + gone.join(' or ') + ' yet today, so this is ' +
+    /* "Yet today" is only true when the figure is today's. Under an "As of
+       Tue" label it read "No HRV yet today", two days in one sentence. */
+    return (gone.length ? 'No ' + gone.join(' or ') +
+            (stale ? ' in the data for that day' : ' yet today') + ', so this is ' +
             'scored on the rest. ' : '') + parts[0].detail + '.';
   }
   return parts[0].detail + '.';
@@ -1633,7 +1868,8 @@ function renderWorking() {
       partList(ln.parts, ln.scored_on);
   }
   if (rec.parts && rec.parts.length) {
-    h += '<p class="eyebrow" style="margin-top:18px">How recovered, today</p>' +
+    h += '<p class="eyebrow" style="margin-top:18px">How recovered, ' +
+      (rec.day && rec.day !== isoDate(new Date()) ? esc(dayLabel(rec.day)) : 'today') + '</p>' +
       partList(rec.parts, rec.scored_on);
   }
   h += '<p class="hint" style="margin-top:16px">Duration, when it ended and how unbroken it was ' +
@@ -2047,7 +2283,12 @@ function latestDay(key) {
          `is_today` comes from the payload now. The page used to infer it
          from `complete: false`, so a day he took the watch off at lunchtime
          got captioned "so far today" if it was the newest row. */
-      return { day: d, partial: true, today: !!d.is_today };
+      /* And checked against this device's date as well. `is_today` is true
+         when the PC built the payload, and a payload built at 22:00 is
+         still on the phone at 05:46 the next morning calling yesterday
+         "so far today". */
+      return { day: d, partial: true,
+               today: !!d.is_today && d.date === isoDate(new Date()) };
     }
     return { day: d, partial: false };
   }
@@ -2320,9 +2561,13 @@ function renderMissing() {
     '<ul class="flags">' + miss.map(function (m) {
       return '<li class="warn"><b>' + esc(m.label) + '</b>, ' + esc(m.what) + '</li>';
     }).join('') + '</ul>' +
-    '<ol class="ol"><li>Health Auto Export on the phone, Automations.</li>' +
-    '<li>Open the Sleep Lab one, then Data Types.</li>' +
-    '<li>Tick those, Save. They appear here within four hours.</li></ol>';
+    /* Menu names read off Health Auto Export's own help page on 2026-11-11.
+       The three lines that were here said Automations, Data Types and Save,
+       which is not what the iPhone app calls any of them, and they were
+       sitting on his screen beside a checked set of steps that disagreed. */
+    '<ol class="ol"><li>Health Auto Export on the phone, Export, then Automated.</li>' +
+    '<li>Open the Sleep Lab one, then Select Health Metrics.</li>' +
+    '<li>Tick those, then Update. They show here after the phone next sends.</li></ol>';
 }
 
 /* ---------------- 4. the week ---------------- */
@@ -2336,9 +2581,18 @@ function renderWeek() {
   var box = el('week');
   if (!state.loaded.history) { box.innerHTML = '<p class="empty">Loading your nights.</p>'; return; }
 
-  var rows = mine(state.history).slice().sort(function (a, b) {
+  /* The list used to end at the newest day file, so "every calendar night"
+     stopped short of today and the night he had just slept was simply
+     absent: not recorded, not missed, not there. Nights the phone has not
+     sent yet now lead the list under their own words. */
+  var f = freshState();
+  var now = f.now;
+  var pend = f.pend.map(function (iso) {
+    return { date: iso, pending: true };
+  });
+  var rows = pend.concat(f.rows.slice().sort(function (a, b) {
     return a.date < b.date ? 1 : (a.date > b.date ? -1 : 0);
-  }).slice(0, 7);
+  })).slice(0, 7);
 
   if (!rows.length) {
     box.innerHTML = '<p class="eyebrow">Last 7 nights</p>' +
@@ -2347,17 +2601,29 @@ function renderWeek() {
     return;
   }
 
-  var on = rows.filter(function (r) { return r.watch_on !== false; });
+  var on = rows.filter(function (r) { return !r.pending && r.watch_on !== false; });
+  var late = rows.filter(function (r) { return r.pending; });
 
   var h = '<p class="eyebrow">Last 7 nights</p>' +
-    '<h3 style="margin:0 0 3px">' + on.length + ' of ' + rows.length + ' recorded</h3>' +
+    '<h3 style="margin:0 0 3px">' + on.length + ' of ' + rows.length + ' recorded' +
+    (late.length ? ', ' + late.length + ' not in yet' : '') + '</h3>' +
     '<p class="sub">Every calendar night, including the ones the watch missed. A night with no ' +
-    'record is the one thing holding every number in the app back.</p>';
+    'record is the one thing holding every number in the app back.' +
+    /* Only names the phone when the phone is the link being waited on. */
+    (late.length ? (f.why === 'phone'
+      ? ' Not in yet means the phone has not sent it, which is not the same as ' +
+        'the watch being off.'
+      : ' Not in yet is not the same as the watch being off.') : '') + '</p>';
 
   h += '<ul class="wk">' + rows.map(function (r) {
+    if (r.pending) {
+      return '<li><div class="r1"><span class="d">' + esc(dayLabel(r.date)) +
+        '</span><span class="t">--</span></div>' +
+        '<div class="r2"><span class="tag bad">' + esc(lateWords(f.why)) + '</span></div></li>';
+    }
     if (r.watch_on === false) {
       return '<li class="off"><div class="r1"><span class="d">' + esc(dayLabel(r.date)) +
-        '</span><span class="t">watch was off, nothing recorded</span></div></li>';
+        '</span><span class="t">' + esc(offWords(r, now)) + '</span></div></li>';
     }
     var tags = [];
     if (r.sleep_score != null) {
@@ -2410,7 +2676,7 @@ function renderWeek() {
     var debt = full.reduce(function (a, r) { return a + (r.debt_min || 0); }, 0);
     h += '<p class="hint" style="margin-top:11px">Mean ' + fmtMin(mean) + ' across the ' +
       full.length + ' night' + (full.length === 1 ? '' : 's') + ' it measured properly, and ' +
-      fmtMin(debt) + ' of debt over these ' + rows.length + ' days.' +
+      fmtMin(debt) + ' of debt over these ' + (rows.length - late.length) + ' days.' +
       (thin.length
         ? ' ' + thin.length + ' night' + (thin.length === 1 ? '' : 's') + ' left out of both, ' +
           'because the watch missed too much of ' + (thin.length === 1 ? 'it' : 'them') +
@@ -2633,7 +2899,8 @@ function renderRecord() {
       '<ul class="nights">' + hist.slice(0, 30).map(function (n) {
         if (n.watch_on === false) {
           return '<li class="off"><div class="l1"><span class="date">' +
-            esc(dayLabel(n.date)) + '</span><span class="l2">watch was off</span>' +
+            esc(dayLabel(n.date)) + '</span><span class="l2">' +
+            esc(offWords(n, new Date())) + '</span>' +
             '</div></li>';
         }
         var band = n.sleep_band || '';
@@ -2863,8 +3130,16 @@ function renderAll() {
   /* No separator when there is nothing after it. The footer read
      "Ironveil Inc. ." on a cold start. */
   var gen = state.payload && state.payload.generated;
+  /* Two clocks, because they are two different facts. The first is when the
+     PC built these numbers. The second is where the phone's data stops, and
+     on 2026-11-11 they were 22 hours apart with only the first on screen. */
+  var fr = pay('freshness');
   el('freshness').textContent = gen
-    ? ' · numbers as of ' + String(gen).replace('T', ' ').slice(0, 16)
+    ? ' · numbers as of ' + String(gen).replace('T', ' ').slice(0, 16) +
+      (state.fetching ? ' · checking for newer numbers'
+        : state.fetchFailed
+        ? ' · could not refresh, this is the saved copy'
+        : (fr && fr.data_through ? ' · phone data to ' + stamp(fr.data_through, new Date()) : ''))
     : '';
 }
 
@@ -3167,10 +3442,33 @@ async function decryptPayload(pass, blob) {
   return JSON.parse(new TextDecoder().decode(pt));
 }
 
+/* One bar of signal does not fail a fetch, it hangs it. With no limit the
+   saved copy sat on screen indefinitely with nothing saying it was a saved
+   copy, because a fetch that never ends never reaches the code that says so. */
+var FETCH_TIMEOUT_MS = 12000;
+
 async function loadPayload(pass) {
-  var r = await fetch(DATA_URL, { cache: 'no-store' });
-  if (!r.ok) throw new Error('could not reach the data file, HTTP ' + r.status);
-  var blob = await r.json();
+  var ctl = (typeof AbortController === 'function') ? new AbortController() : null;
+  var timer = ctl ? setTimeout(function () { ctl.abort(); }, FETCH_TIMEOUT_MS) : null;
+  var blob;
+  try {
+    var r = await fetch(DATA_URL, ctl ? { cache: 'no-store', signal: ctl.signal }
+                                      : { cache: 'no-store' });
+    if (!r.ok) throw new Error('the data file answered HTTP ' + r.status);
+    /* Inside the same limit, because the body can stall after the headers
+       have arrived. */
+    blob = await r.json();
+  } catch (e) {
+    if (e && e.name === 'AbortError') {
+      throw new Error('the data took more than ' + (FETCH_TIMEOUT_MS / 1000) +
+        ' seconds to arrive');
+    }
+    /* fetch rejects with a TypeError when there is no route to the file. */
+    if (e instanceof TypeError) throw new Error('no connection to the data file');
+    throw e;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
   try {
     return await decryptPayload(pass, blob);
   } catch (e) {
@@ -3235,6 +3533,9 @@ el('gateGo').onclick = async function () {
   el('gateMsg').textContent = 'Checking.';
   try {
     var p = await loadPayload(k);
+    state.fetchFailed = null;
+    state.fetching = false;
+    lastFetchAt = Date.now();
     setKey(k); cachePayload(p); hideGate(); applyPayload(p);
   } catch (e) {
     el('gateMsg').textContent = e.message;
@@ -3242,21 +3543,84 @@ el('gateGo').onclick = async function () {
   el('gateGo').disabled = false;
 };
 
-(async function boot() {
-  /* Paint from the last known numbers first, then go and get fresh ones. That
-     is what makes it open instantly instead of showing a spinner. */
-  var had = applyPayload(cachedPayload());
+var inFlight = false;
+var lastFetchAt = 0;
+var RESUME_REFETCH_MS = 60000;
+
+async function refresh(had) {
+  /* Go and get fresh numbers. `had` is whether something is already painted.
+     One at a time, so a resume that lands during the boot fetch does not
+     start a second one. */
   var key = getKey();
-  if (!key) { showGate(''); return; }
-  hideGate();
+  if (!key || inFlight) return;
+  inFlight = true;
+  /* Said on screen while it is in the air. Without this the saved copy was
+     painted first and the note under it blamed the phone or the PC off
+     numbers that were about to be replaced. */
+  if (!state.fetching) {
+    state.fetching = true;
+    if (had) renderAll();
+  }
   try {
     var p = await loadPayload(key);
     cachePayload(p);
+    state.fetchFailed = null;
+    state.fetching = false;
+    hideGate();
     applyPayload(p);
   } catch (e) {
-    if (!had) showGate(e.message);
+    state.fetching = false;
+    if (!had) {
+      showGate(e.message);
+    } else {
+      /* The fetch failed and there was a saved copy, so the saved copy stays
+         on screen. That used to be the end of it: one bar of signal in a
+         cruiser and the app painted old numbers from storage with nothing
+         saying they were not fresh, the same shape as a night that has not
+         arrived. The page is told, and says so at the top of Today and in
+         the footer. The saved copy is kept either way, because old numbers
+         with a label beat a locked screen at five in the morning. */
+      state.fetchFailed = (e && e.message) || 'no reason given';
+      renderAll();
+    }
   }
+  lastFetchAt = Date.now();
+  inFlight = false;
+}
+
+(async function boot() {
+  /* Paint from the last known numbers first, then go and get fresh ones. That
+     is what makes it open instantly instead of showing a spinner. The flag
+     goes up BEFORE that first paint, so the first frame already says it is
+     checking. */
+  var key = getKey();
+  state.fetching = !!key;
+  var had = applyPayload(cachedPayload());
+  if (!key) { showGate(''); return; }
+  hideGate();
+  await refresh(had);
 })();
+
+/* Coming back to the app is not opening it. iOS returns a home screen app
+   exactly as it was left: no reload, no fetch, and every sentence that
+   depends on the clock still says what was true when it was drawn. Left
+   open at 22:00 and picked up at 05:46, it showed the 22:00 screen, with no
+   night marked late because at 22:00 none was. A review found this, and it
+   is the same thing he photographed.
+
+   So every return to the foreground redraws against the clock, and goes
+   for fresh numbers unless it has only just done so. */
+function onResume() {
+  if (!getKey()) return;
+  if (Date.now() - lastFetchAt > RESUME_REFETCH_MS) refresh(!!state.payload);
+  else renderAll();
+}
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'visible') onResume();
+});
+window.addEventListener('pageshow', function (e) {
+  if (e.persisted) onResume();
+});
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
