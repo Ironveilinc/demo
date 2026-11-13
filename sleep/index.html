@@ -1587,7 +1587,8 @@ function wakeChain(detail, rt, prefs) {
     var w = told - gymBlock;
     if (gymBlock) {
       out.steps.push({
-        what: 'Gym first, ' + prefs.gymMin + ' min plus ' + prefs.gymTravelMin + ' there and back',
+        what: 'Gym first, ' + prefs.gymMin + ' min' + (prefs.gymTravelMin
+          ? ' plus ' + prefs.gymTravelMin + ' there and back' : ', travel included'),
         at: minToHhmm(w)
       });
     }
@@ -1620,7 +1621,8 @@ function wakeChain(detail, rt, prefs) {
   ];
   if (gymBlock) {
     out.steps.push({
-      what: 'Gym, ' + prefs.gymMin + ' min plus ' + prefs.gymTravelMin + ' there and back',
+      what: 'Gym, ' + prefs.gymMin + ' min' + (prefs.gymTravelMin
+        ? ' plus ' + prefs.gymTravelMin + ' there and back' : ', travel included'),
       at: minToHhmm(leave - gymBlock)
     });
   }
@@ -1682,7 +1684,10 @@ var PREF_KEY = 'sleeplab.prefs.v2';
 var DEFAULT_PREFS = {
   skin: 'rose', profile: 'trey',
   commuteMin: null, prepMin: null,
-  gym: false, gymMin: 60, gymTravelMin: 10,
+  /* 60 and 0, his number. Trey 2026-11-12: a gym morning is up at 5, against
+     5:55 to 6 otherwise, so the whole block, travel included, is an hour. It
+     shipped as 60 plus 10, which was mine and put the alarm at 04:50. */
+  gym: false, gymMin: 60, gymTravelMin: 0, gymFrom: null,
   doseMg: CAF.DEFAULT_DOSE_MG, targetMg: CAF.DEFAULT_TARGET_MG,
   halfLifeH: CAF.HALF_LIFE_H,
   goals: { move: null, exercise: null, stand: null, steps: null },
@@ -1700,6 +1705,13 @@ function loadPrefs() {
   if (out.commuteMin === undefined) out.commuteMin = null;
   if (out.prepMin === undefined) out.prepMin = null;
   out.goals = Object.assign({}, DEFAULT_PREFS.goals, p.goals || {});
+  /* Once, and only over the pair this app invented. A phone that saved any
+     setting before 2026-11-12 is carrying 60 plus 10 as if he had chosen it.
+     Anything he has typed since is marked 'typed' and left alone. */
+  if (!p.gymFrom && out.gymMin === 60 && out.gymTravelMin === 10) {
+    out.gymTravelMin = 0;
+    out.gymFrom = 'trey-2026-11-12';
+  }
   /* The old build kept the skin under its own key. Carry it over so
      whichever one he picked in October survives this version. */
   if (!p.skin) {
@@ -3135,7 +3147,8 @@ function readSettingsForm() {
   p.prepMin = num('setPrep', null, 0, 180);
   p.gym = el('setGym').checked;
   p.gymMin = req('setGymMin', 60, 0, 240);
-  p.gymTravelMin = req('setGymTravel', 10, 0, 120);
+  p.gymTravelMin = req('setGymTravel', 0, 0, 120);
+  p.gymFrom = 'typed';
   p.doseMg = req('setDose', CAF.DEFAULT_DOSE_MG, 25, 800);
   p.targetMg = req('setTarget', CAF.DEFAULT_TARGET_MG, 10, 400);
   p.halfLifeH = req('setHalf', CAF.HALF_LIFE_H, 1.5, 9.5);
