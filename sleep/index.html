@@ -1807,7 +1807,7 @@ function renderScore() {
            that is not today it says which day, instead of standing under
            a heading that reads as this morning. */
         '<p class="hint">' + esc((recStale ? 'As of ' + dayLabel(rec.day) + '. ' : '') +
-          recoveryLine(rec, recStale, settledNoNight(rec.day))) + '</p>';
+          recoveryLine(rec, recStale, nightGone(rec.day, recStale))) + '</p>';
     }
     h += '</div></div>';
   }
@@ -1882,10 +1882,11 @@ function restfulLine(ln) {
   return worst.label + ' is what held it back. ' + worst.detail + '.';
 }
 
-function recoveryLine(rec, stale, noNight) {
-  /* noNight: the night that ended on the recovery's own day is settled as
-     not measured. "No last night yet today" promised a night that is not
-     coming, so that case gets its own words. */
+function recoveryLine(rec, stale, gone2) {
+  /* gone2: words for a night that is NOT still on its way, from nightGone,
+     or null. "No last night yet today" promised a night that was not coming,
+     twice over: once when the watch had not measured it at all, and once
+     when it had arrived too thinly measured to score. */
   var parts = (rec.parts || []).slice().sort(function (a, b) {
     return (a.earned / a.weight) - (b.earned / b.weight);
   });
@@ -1903,10 +1904,9 @@ function recoveryLine(rec, stale, noNight) {
        Tue" label it read "No HRV yet today", two days in one sentence. */
     var lead = '';
     var i = gone.indexOf('last night');
-    if (noNight && i !== -1) {
+    if (gone2 && i !== -1) {
       gone.splice(i, 1);
-      /* Under an "As of Thu" label on a Friday, "last night" is the wrong night. */
-      lead = stale ? 'The night before was not measured' : 'Last night was not measured';
+      lead = gone2;
     }
     var missing = gone.length ? 'no ' + gone.join(' or ') +
       (stale ? ' in the data for that day' : ' yet today') : '';
@@ -1917,12 +1917,23 @@ function recoveryLine(rec, stale, noNight) {
   return parts[0].detail + '.';
 }
 
-function settledNoNight(day) {
-  /* True when the row for `day` is a morning with no night AND the watch's
-     readings have come back, so no night for it is still on its way. */
+function nightGone(day, stale) {
+  /* Why the recovery has no night to lean on, in words, when that is
+     settled. Null while the night may still arrive.
+       - no night, and the watch's readings have come back: not measured
+       - a night that arrived and could not be scored: say that, because it
+         is here, and "yet" would be wrong about it
+     Under an "As of Thu" label on a Friday, "last night" is the wrong night,
+     so a stale figure says "the night before". */
   var hit = null;
   mine(state.history).forEach(function (r) { if (r.date === day) hit = r; });
-  return !!(hit && hit.watch_on === false && hit.no_hr && hit.no_hr.from && hit.no_hr.to);
+  if (!hit) return null;
+  var which = stale ? 'The night before' : 'Last night';
+  if (hit.watch_on === false) {
+    return (hit.no_hr && hit.no_hr.from && hit.no_hr.to) ? which + ' was not measured' : null;
+  }
+  if (hit.sleep_score == null) return which + ' was not measured well enough to score';
+  return null;
 }
 
 function partList(parts, scoredOn) {
