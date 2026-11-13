@@ -1181,6 +1181,16 @@ function staleWords(o) {
   var late = o.late || 0;
   if (!late && !o.emptyToday && o.why !== 'offline') return null;
 
+  /* o.silence   { from, to } in words, the stretch with no heart rate over
+                 the night that is missing. `to` is null while it is still
+                 going at the end of what the phone sent.
+     o.fragment  { mins, from, to } in words, a sleep record the watch logged
+                 with no stages and no heart rate, which is not counted.
+     Both added 2026-11-12, both only ever about today's row. The watch had
+     recorded no heart rate from 21:19 to 09:37 and Health still handed over
+     1h12 "asleep" from 05:03, which the app scored 12 out of 100. */
+  var closed = !late && o.emptyToday && o.silence && o.silence.from && o.silence.to;
+
   var lead;
   if (late === 1) {
     lead = 'Nothing from ' + o.lateLabel + ' is in yet.';
@@ -1189,14 +1199,27 @@ function staleWords(o) {
        arrived. With the PC off for two days it said "nothing from Thu"
        above a Tuesday. */
     lead = (o.capped ? 'At least the last ' : 'The last ') + late + ' nights are not in yet.';
+  } else if (closed) {
+    /* The readings came back, so this is settled and not a late send. It
+       says what the watch recorded, not where the watch was. */
+    lead = 'The watch did not measure last night.';
   } else if (o.emptyToday) {
     lead = 'No sleep in what your phone has sent today.';
   } else {
     lead = 'Could not refresh just now.';
   }
 
-  var body = (late || o.emptyToday) ? 'The night below is the newest one scored.' : '';
+  var body = '';
   function add(s) { body += (body ? ' ' : '') + s; }
+  if (closed) {
+    add('It recorded no heart rate from ' + o.silence.from + ' to ' + o.silence.to +
+      ', so there is no night to score.');
+  }
+  if (!late && o.emptyToday && o.fragment) {
+    add('It did log ' + o.fragment.mins + ' from ' + o.fragment.from + ' to ' + o.fragment.to +
+      ' with no sleep stages and no heart rate, which is not counted as a night.');
+  }
+  if (late || o.emptyToday) add('The night below is the newest one scored.');
 
   if (o.why === 'checking') {
     add('Checking for newer numbers now.');
@@ -1221,9 +1244,12 @@ function staleWords(o) {
       add('What the phone has sent stops at ' + o.through + '.');
     }
     add('It lands after Health Auto Export next runs with the phone unlocked.');
-  } else {
+  } else if (!closed) {
     /* Today's file is in with no sleep. Say where it stops and nothing
        about why, because the page cannot know why. */
+    if (o.silence && o.silence.from) {
+      add('The watch has recorded no heart rate since ' + o.silence.from + '.');
+    }
     if (o.through) add('What it sent stops at ' + o.through + '.');
     add('If the watch was on your wrist, the night should come with a later send.');
   }
@@ -1241,10 +1267,37 @@ function lateWords(why) {
 function offWords(row, now) {
   /* A day file with no sleep in it. Final once the day is over. On its own
      date it is still being rewritten, so it gets words that can be true
-     whichever way it turns out. */
-  return row.date === isoDate(now)
-    ? 'phone has sent today, no sleep in it so far'
-    : 'watch was off, nothing recorded';
+     whichever way it turns out.
+
+     When the PC found a long stretch with no heart rate over that night, the
+     row says so with its two clock times, because that is a measurement and
+     "watch was off" is a guess about his wrist. Once the readings have come
+     back the night is settled, today or not. */
+  var s = row.no_hr || {};
+  var a = s.from ? new Date(s.from) : null, b = s.to ? new Date(s.to) : null;
+  if (a && isNaN(a.getTime())) a = null;
+  if (b && isNaN(b.getTime())) b = null;
+  if (a && b) return 'no heart rate ' + clock(a) + ' to ' + clock(b) + ', not measured';
+  if (row.date === isoDate(now)) return 'phone has sent today, no sleep in it so far';
+  if (a) return 'no heart rate from ' + clock(a) + ', not measured';
+  return 'watch was off, nothing recorded';
+}
+
+function silenceWords(row, now) {
+  /* The same stretch for the note on Today, where it carries its weekdays
+     because it crosses midnight. Null when the PC sent no such stretch. */
+  var s = row && row.no_hr;
+  if (!s || !s.from) return null;
+  return { from: stamp(s.from, now), to: s.to ? stamp(s.to, now) : null };
+}
+
+function fragmentWords(row) {
+  /* A sleep record that was logged and not counted, in words. */
+  var u = row && row.unmeasured;
+  if (!u || !u.slept_min) return null;
+  var m = Math.round(u.slept_min);
+  return { mins: Math.floor(m / 60) + 'h' + (m % 60 < 10 ? '0' : '') + (m % 60),
+           from: u.onset_clock, to: u.wake_clock };
 }
 
 function stamp(iso, now) {
@@ -1742,7 +1795,7 @@ function renderScore() {
            that is not today it says which day, instead of standing under
            a heading that reads as this morning. */
         '<p class="hint">' + esc((recStale ? 'As of ' + dayLabel(rec.day) + '. ' : '') +
-          recoveryLine(rec, recStale)) + '</p>';
+          recoveryLine(rec, recStale, settledNoNight(rec.day))) + '</p>';
     }
     h += '</div></div>';
   }
@@ -1779,11 +1832,15 @@ function staleNote() {
      clock that did not arrive is left out, not filled in. The wording
      itself lives in staleWords, where the gate can reach it. */
   var f = freshState();
+  var todayRow = null, today = isoDate(f.now);
+  f.rows.forEach(function (r) { if (r.date === today) todayRow = r; });
   var w = staleWords({
     late: f.pend.length,
     capped: f.pend.length >= 7,
     lateLabel: f.pend.length ? dayLabel(f.pend[0]) : null,
     emptyToday: f.empty,
+    silence: f.empty ? silenceWords(todayRow, f.now) : null,
+    fragment: f.empty ? fragmentWords(todayRow) : null,
     why: f.why,
     built: f.built ? stamp(f.built, f.now) : null,
     sent: f.fr.phone_sent ? stamp(f.fr.phone_sent, f.now) : null,
@@ -1813,7 +1870,10 @@ function restfulLine(ln) {
   return worst.label + ' is what held it back. ' + worst.detail + '.';
 }
 
-function recoveryLine(rec, stale) {
+function recoveryLine(rec, stale, noNight) {
+  /* noNight: the night that ended on the recovery's own day is settled as
+     not measured. "No last night yet today" promised a night that is not
+     coming, so that case gets its own words. */
   var parts = (rec.parts || []).slice().sort(function (a, b) {
     return (a.earned / a.weight) - (b.earned / b.weight);
   });
@@ -1829,11 +1889,28 @@ function recoveryLine(rec, stale) {
                    .map(function (w) { return w[1]; });
     /* "Yet today" is only true when the figure is today's. Under an "As of
        Tue" label it read "No HRV yet today", two days in one sentence. */
-    return (gone.length ? 'No ' + gone.join(' or ') +
-            (stale ? ' in the data for that day' : ' yet today') + ', so this is ' +
-            'scored on the rest. ' : '') + parts[0].detail + '.';
+    var lead = '';
+    var i = gone.indexOf('last night');
+    if (noNight && i !== -1) {
+      gone.splice(i, 1);
+      /* Under an "As of Thu" label on a Friday, "last night" is the wrong night. */
+      lead = stale ? 'The night before was not measured' : 'Last night was not measured';
+    }
+    var missing = gone.length ? 'no ' + gone.join(' or ') +
+      (stale ? ' in the data for that day' : ' yet today') : '';
+    var why = lead && missing ? lead + ' and there is ' + missing
+      : (lead || (missing ? 'N' + missing.slice(1) : ''));
+    return (why ? why + ', so this is scored on the rest. ' : '') + parts[0].detail + '.';
   }
   return parts[0].detail + '.';
+}
+
+function settledNoNight(day) {
+  /* True when the row for `day` is a morning with no night AND the watch's
+     readings have come back, so no night for it is still on its way. */
+  var hit = null;
+  mine(state.history).forEach(function (r) { if (r.date === day) hit = r; });
+  return !!(hit && hit.watch_on === false && hit.no_hr && hit.no_hr.from && hit.no_hr.to);
 }
 
 function partList(parts, scoredOn) {
