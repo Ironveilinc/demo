@@ -1,0 +1,1433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<title>SOAP Chapter Event Report</title>
+<meta name="description" content="Fill this in after every event your chapter runs. It tells SOAP what sold, what was given away and how the money came in.">
+<meta property="og:title" content="SOAP Chapter Event Report">
+<meta property="og:description" content="Fill this in after every event your chapter runs. It tells SOAP what sold, what was given away and how the money came in.">
+<meta property="og:image" content="https://demo.ironveilinc.com/soap-report/preview.png">
+<meta property="og:url" content="https://demo.ironveilinc.com/soap-report/">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMzAwIDU5NiIgd2lkdGg9IjEzMDAiIGhlaWdodD0iNTk2Ij48cGF0aCBmaWxsPSIjMDAwMDAwIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw2NTAuNDAwNCwzNzIuOTI4MjMpIiBkPSJNMCAwQzAgMC00Mi4yNyAxMDcuMDg2LTI0My43NTQgMTcwLjQ5MS0zODguMTYyIDIxNS45MzEtNTE4LjUwOCAyNTYuNDM2LTYwNS44NjUgMzY0LjkyOC02MDUuODY1IDM2NC45MjgtNTI0LjE0MyAyMDQuMzAyLTM3MS45NjkgMTY2LjI2MS0yMTkuODAyIDEyOC4yMjEtNjcuNjI4IDkxLjU4NiAwIDAiLz48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw2MDguMTMwOSwzNDguOTc2MSkiIGQ9Ik0wIDBDMCAwLTExMi4zMTggNzkuMzc3LTI1Ny44NDMgOTAuMTc1LTQwNi44NTIgMTAxLjIzNy01MjQuOTU2IDE5MS44NTMtNjAwLjIzIDI1MC44MDEtNjAwLjIzIDI1MC44MDEtNDc5LjA1NiAxMjUuNDA0LTM1OC43MjcgNTIuMTYtMTg4LjQ4MS01MS40NjYtOTIuOTkzIDYxLjk5OSAwIDAiIGZpbGw9IiNjMTA2MjEiLz48cGF0aCBmaWxsPSIjMDAwMDAwIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw2NTAuNDAwNCw1ODUuNjgzNikiIGQ9Ik0wIDBDMCAwIDAgMzMuMTEyLTc2LjA4NyA5NC40MDUtMTQ5Ljk0MiAxNTMuOTAxLTE2NC4xNDQgMjIyLjI3OS04Ni42NDYgMjQxLjMwMy0xMjIuNTggMjUyLjIwOC0zMDIuOTMgMTg4LjEwMy00MjEuOTkyIDI1NS43MzEtNDIxLjk5MiAyNTUuNzMxLTM2OS4xNDYgMjA1LjcxNC0yNDQuMjIxIDE1Ni4zOTctOTguMzI1IDk4LjgwNS0xMS42MjMgNTAuMzcgMCAwIi8+PHBhdGggZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNjI1LjUwODgsNTY3LjM2NTcpIiBkPSJNMCAwQzAgMC04NS4wMTMgMTAyLjgwNy0yNDkuODYyIDYzLjM1NC0yNDkuODYyIDYzLjM1NC0xODguNjE5IDYwLjkyOC0xMTEuMzEgNDAuMzg1LTMxLjk5NiAxOS4zMTMgMCAwIDAgMCIvPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY1MC41MDEsMzcyLjkyODIzKSIgZD0iTTAgMEMwIDAgNDIuMjcgMTA3LjA4NiAyNDMuNzU0IDE3MC40OTEgMzg4LjE2MiAyMTUuOTMxIDUxOC41MDggMjU2LjQzNiA2MDUuODY1IDM2NC45MjggNjA1Ljg2NSAzNjQuOTI4IDUyNC4xNDMgMjA0LjMwMiAzNzEuOTY5IDE2Ni4yNjEgMjE5LjgwMiAxMjguMjIxIDY3LjYyOCA5MS41ODYgMCAwIi8+PHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNjkyLjc3MDUsMzQ4Ljk3NjEpIiBkPSJNMCAwQzAgMCAxMTIuMzE4IDc5LjM3NyAyNTcuODQyIDkwLjE3NSA0MDYuODUyIDEwMS4yMzcgNTI0Ljk1NiAxOTEuODUzIDYwMC4yMjkgMjUwLjgwMSA2MDAuMjI5IDI1MC44MDEgNDc5LjA1NiAxMjUuNDA0IDM1OC43MjcgNTIuMTYgMTg4LjQ4LTUxLjQ2NiA5Mi45OTIgNjEuOTk5IDAgMCIgZmlsbD0iI2MxMDYyMSIvPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY1MC41MDEsNTg1LjY4MzYpIiBkPSJNMCAwQzAgMCAwIDMzLjExMiA3Ni4wODcgOTQuNDA1IDE0OS45NDIgMTUzLjkwMSAxNjQuMTQ0IDIyMi4yNzkgODYuNjQ1IDI0MS4zMDMgMTIyLjU4IDI1Mi4yMDggMzAyLjkzIDE4OC4xMDMgNDIxLjk5MiAyNTUuNzMxIDQyMS45OTIgMjU1LjczMSAzNjkuMTQ2IDIwNS43MTQgMjQ0LjIyMSAxNTYuMzk3IDk4LjMyNSA5OC44MDUgMTEuNjIzIDUwLjM3IDAgMCIvPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY3NS4zOTI2LDU2Ny4zNjU3KSIgZD0iTTAgMEMwIDAgODUuMDEzIDEwMi44MDcgMjQ5Ljg2MiA2My4zNTQgMjQ5Ljg2MiA2My4zNTQgMTg4LjYxOSA2MC45MjggMTExLjMxIDQwLjM4NSAzMS45OTUgMTkuMzEzIDAgMCAwIDAiLz48L3N2Zz4=">
+<style>
+  
+  :root {
+    --red: #C7383A;
+    --red-soft: #FBECEC;
+    --ink: #111111;
+    --gray: #66615C;
+    --paper: #EBEAEB;
+    --card: #FFFFFF;
+    --line: #CFCBC8;
+    --field: #B9B4B0;
+    --ok: #1E6B3A;
+    --ok-soft: #E8F3EC;
+    --bad: #A3221F;
+    --bad-soft: #FBEAEA;
+    --head: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --body: Arial, Helvetica, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 17px/1.45 var(--body);
+    padding-bottom: 96px;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 0 12px; }
+  header.top { background: var(--card); border-bottom: 4px solid var(--red); }
+  header.top .wrap { padding-top: 22px; padding-bottom: 18px; text-align: center; }
+  header.top img { width: 190px; height: auto; display: block; margin: 0 auto; }
+  h1 {
+    font: 500 28px/1.15 var(--head);
+    margin: 22px 0 6px;
+    letter-spacing: 0.01em;
+  }
+  .lede { margin: 0 0 4px; color: var(--ink); }
+  .lede.small { color: var(--gray); font-size: 15px; }
+
+  .banner {
+    margin: 16px 0 0; padding: 12px 14px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--line); font-size: 15px;
+    display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  }
+
+  section.card {
+    background: var(--card);
+    border-radius: 14px;
+    margin: 16px 0;
+    padding: 18px 16px 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  h2 {
+    font: 500 21px/1.2 var(--head);
+    margin: 0 0 4px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .n {
+    flex: none; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--red); color: #fff; font: 700 16px/30px var(--body); text-align: center;
+  }
+  .help { color: var(--gray); font-size: 15px; margin: 0 0 12px; }
+  .help.fhelp { margin: -2px 0 8px; }
+
+  .field { margin: 0 0 16px; }
+  label, .label { display: block; font-weight: 700; margin: 0 0 6px; font-size: 16px; }
+  .opt { font-weight: 400; color: var(--gray); }
+  input[type=text], input[type=email], input[type=date], input[type=url], select, textarea {
+    width: 100%;
+    min-height: 50px;
+    font: 17px/1.3 var(--body);
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--field);
+    border-radius: 9px;
+    padding: 11px 12px;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  select {
+    background-image: linear-gradient(45deg, transparent 50%, var(--gray) 50%), linear-gradient(135deg, var(--gray) 50%, transparent 50%);
+    background-position: calc(100% - 20px) 22px, calc(100% - 14px) 22px;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 36px;
+  }
+  textarea { min-height: 76px; resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--red); outline-offset: 1px; border-color: var(--red); }
+  .bad-field { border-color: var(--bad) !important; background: var(--bad-soft) !important; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row-city { display: grid; grid-template-columns: 1fr 120px; gap: 12px; }
+  .hidden { display: none !important; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips label { margin: 0; font-weight: 400; }
+  .chips input, .choice input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .chips span {
+    display: inline-block; min-height: 46px; padding: 12px 16px; border-radius: 999px;
+    border: 1px solid var(--field); background: #fff; cursor: pointer; font-size: 16px; line-height: 20px;
+  }
+  .chips input:checked + span { border-color: var(--red); background: var(--red-soft); font-weight: 700; }
+  .chips input:focus-visible + span, .choice input:focus-visible + span { outline: 2px solid var(--red); outline-offset: 2px; }
+  .choice { display: block; margin: 0 0 10px; font-weight: 400; }
+  .choice span {
+    display: block; padding: 14px 14px 14px 46px; border: 1px solid var(--field); border-radius: 12px;
+    background: #fff; cursor: pointer; position: relative;
+  }
+  .choice span::before {
+    content: ""; position: absolute; left: 14px; top: 16px; width: 20px; height: 20px;
+    border-radius: 50%; border: 2px solid var(--field); background: #fff;
+  }
+  .choice input:checked + span { border-color: var(--red); background: var(--red-soft); }
+  .choice input:checked + span::before { border-color: var(--red); background: radial-gradient(var(--red) 45%, #fff 50%); }
+  .choice b { display: block; }
+  .choice small { color: var(--gray); font-size: 14px; }
+  .group-bad .chips span, .group-bad .choice span { border-color: var(--bad); }
+
+  .check { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; margin: 4px 0 16px; cursor: pointer; }
+  .check input { width: 24px; height: 24px; margin: 1px 0 0; flex: none; accent-color: var(--red); }
+
+  
+  .item {
+    border: 1px solid var(--line); border-radius: 12px; padding: 14px 12px 6px; margin: 0 0 14px;
+    background: #FCFBFB;
+  }
+  .item-head { display: flex; justify-content: space-between; align-items: center; margin: 0 0 8px; }
+  .item-head strong { font: 500 17px/1.2 var(--head); }
+  .linkish {
+    background: none; border: 0; color: var(--red); font: 700 15px/1 var(--body);
+    padding: 12px 4px; cursor: pointer; min-height: 44px;
+  }
+  .line { display: grid; grid-template-columns: 76px auto 1fr auto; gap: 8px; align-items: center; margin: 0 0 8px; }
+  .line .word { color: var(--gray); font-size: 15px; }
+  .line .x { min-width: 44px; min-height: 44px; border: 0; background: none; color: var(--gray); font-size: 22px; cursor: pointer; }
+  .money-in { position: relative; }
+  .money-in::before { content: "$"; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--gray); }
+  .money-in input { padding-left: 24px; }
+  .num { text-align: right; }
+  .give { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .give label { font-weight: 400; font-size: 14px; color: var(--gray); margin: 0 0 4px; }
+  .listprice { color: var(--gray); font-size: 14px; margin: -2px 0 8px; }
+  .status { border-radius: 9px; padding: 10px 12px; margin: 4px 0 10px; font-size: 15px; }
+  .status.ok { background: var(--ok-soft); color: var(--ok); }
+  .status.bad { background: var(--bad-soft); color: var(--bad); font-weight: 700; }
+  .status.wait { background: #F3F2F1; color: var(--gray); }
+  .item-sales { font-size: 15px; color: var(--gray); margin: 0 0 8px; }
+  .add {
+    width: 100%; min-height: 54px; border: 2px dashed var(--red); border-radius: 12px;
+    background: #fff; color: var(--red); font: 700 17px/1 var(--body); cursor: pointer; margin: 0 0 14px;
+  }
+
+  
+  .grid-money { display: grid; grid-template-columns: 74px 1fr 1fr; gap: 8px 10px; align-items: center; }
+  .grid-money .hd { font-weight: 700; font-size: 15px; }
+  .grid-money .m { font-weight: 700; }
+  .grid-money .m small { display: block; font-weight: 400; font-size: 12px; color: var(--gray); }
+  .grid-money .tot { font-weight: 700; padding: 6px 2px; text-align: right; }
+  .totals { border-top: 1px solid var(--line); margin: 12px 0 14px; padding-top: 10px; }
+  .totals div { display: flex; justify-content: space-between; padding: 3px 0; }
+  .totals .big { font-weight: 700; font-size: 18px; }
+
+  
+  .problems {
+    background: var(--bad-soft); border: 1px solid var(--bad); color: var(--bad);
+    border-radius: 12px; padding: 12px 14px; margin: 0 0 14px;
+  }
+  .problems p { margin: 0 0 6px; font-weight: 700; }
+  .problems ul { margin: 0; padding-left: 20px; }
+  .problems li { margin: 4px 0; }
+  .problems a { color: var(--bad); }
+  .send {
+    width: 100%; min-height: 58px; border: 0; border-radius: 12px; background: var(--red); color: #fff;
+    font: 700 19px/1 var(--body); cursor: pointer; margin: 4px 0 10px;
+  }
+  .send:disabled { opacity: 0.6; cursor: wait; }
+  .fine { color: var(--gray); font-size: 14px; margin: 0 0 12px; }
+
+  .panel { background: var(--card); border-radius: 14px; margin: 16px 0; padding: 18px 16px; border-top: 6px solid var(--red); }
+  .panel h2 { margin-bottom: 8px; }
+  .panel .mark { width: 120px; display: block; margin: 4px auto 12px; }
+  .btn {
+    display: block; width: 100%; min-height: 54px; border-radius: 12px; border: 0; background: var(--red);
+    color: #fff; font: 700 18px/54px var(--body); text-align: center; text-decoration: none; cursor: pointer; margin: 12px 0;
+  }
+  .btn.ghost { background: #fff; color: var(--red); border: 2px solid var(--red); line-height: 50px; }
+  .copybox { width: 100%; min-height: 220px; font: 14px/1.4 Consolas, Menlo, monospace; }
+  .rid { font: 700 18px/1.3 Consolas, Menlo, monospace; }
+
+  
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    background: #fff; border-top: 1px solid var(--line); box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  }
+  .bar .in { max-width: 680px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; }
+  .bar .k { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; }
+  .bar .v { font: 700 18px/1.2 var(--body); }
+  .bar .v.ok { color: var(--ok); }
+  .bar .v.bad { color: var(--bad); }
+
+  footer { text-align: center; color: var(--gray); font-size: 14px; padding: 18px 0 30px; }
+  footer img { width: 64px; display: block; margin: 0 auto 6px; }
+  footer a { color: var(--gray); }
+
+  @media (min-width: 720px) {
+    body { font-size: 17px; }
+    header.top img { width: 220px; }
+    h1 { font-size: 32px; }
+    section.card { padding: 24px 24px 12px; }
+    .grid-money { grid-template-columns: 120px 1fr 1fr; }
+  }
+  @media (max-width: 360px) {
+    .row-city { grid-template-columns: 1fr; }
+    .grid-money { grid-template-columns: 64px 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <img src="data:image/png;base64,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" alt="The SOAP Project, Save Our Adolescents from Prostitution" width="544" height="263">
+    <h1>Chapter Event Report</h1>
+    <p class="lede">Fill this in after every event your chapter runs. It tells SOAP what sold, what was given away and how the money came in.</p>
+    <p class="lede small">It takes about 10 minutes. Have your count of what came home, your cash total and your Venmo history handy.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div id="draft-banner" class="banner hidden" role="status">
+    <span id="draft-text">We kept the report you started.</span>
+    <button type="button" class="linkish" id="draft-clear">Start over</button>
+  </div>
+
+  <form id="report" novalidate autocomplete="on">
+
+    
+    <section class="card" aria-labelledby="h-event">
+      <h2 id="h-event"><span class="n">1</span>The event</h2>
+      <p class="help">Who ran the table, and where.</p>
+
+      <div class="field">
+        <label for="chapter">Your chapter</label>
+        <select id="chapter" name="chapter">
+          <option value="">Choose your chapter</option>
+          <option value="Boise, Idaho">Boise, Idaho</option>
+          <option value="Charlotte, North Carolina">Charlotte, North Carolina</option>
+          <option value="Cleveland, Ohio">Cleveland, Ohio</option>
+          <option value="Dayton, Ohio">Dayton, Ohio</option>
+          <option value="Denver, Colorado">Denver, Colorado</option>
+          <option value="Detroit, Michigan">Detroit, Michigan</option>
+          <option value="Dunedin, Florida">Dunedin, Florida</option>
+          <option value="Gulf Coast, Mississippi">Gulf Coast, Mississippi</option>
+          <option value="Jacksonville, Florida">Jacksonville, Florida</option>
+          <option value="Jersey Shore, New Jersey">Jersey Shore, New Jersey</option>
+          <option value="Kansas City, Missouri">Kansas City, Missouri</option>
+          <option value="Mayfield, Kentucky">Mayfield, Kentucky</option>
+          <option value="Medina, Ohio">Medina, Ohio</option>
+          <option value="North Jersey, New Jersey">North Jersey, New Jersey</option>
+          <option value="Oklahoma City, Oklahoma">Oklahoma City, Oklahoma</option>
+          <option value="Phoenix, Arizona">Phoenix, Arizona</option>
+          <option value="Scotch Plains, New Jersey">Scotch Plains, New Jersey</option>
+          <option value="Seattle, Washington">Seattle, Washington</option>
+          <option value="Shreveport, Louisiana">Shreveport, Louisiana</option>
+          <option value="Stockton, California">Stockton, California</option>
+          <option value="Tampa/Clearwater, Florida">Tampa/Clearwater, Florida</option>
+          <option value="Texarkana, Texas">Texarkana, Texas</option>
+          <option value="Toledo, Ohio">Toledo, Ohio</option>
+          <option value="__unlisted">My chapter is not listed</option>
+        </select>
+      </div>
+      <div class="field hidden" id="chapter-other-wrap">
+        <label for="chapter_other">Chapter city and state</label>
+        <input type="text" id="chapter_other" name="chapter_other" maxlength="80" placeholder="Tucson, Arizona">
+      </div>
+
+      <div class="field">
+        <label for="leader_name">Your name</label>
+        <input type="text" id="leader_name" name="leader_name" autocomplete="name" maxlength="80">
+      </div>
+      <div class="field">
+        <label for="leader_email">Your email</label>
+        <input type="email" id="leader_email" name="leader_email" autocomplete="email" inputmode="email" maxlength="120">
+      </div>
+
+      <div class="field">
+        <label for="event_name">Event name</label>
+        <input type="text" id="event_name" name="event_name" maxlength="120" placeholder="Downtown Christmas Market">
+      </div>
+      <div class="field">
+        <label for="event_date">Event date</label>
+        <input type="date" id="event_date" name="event_date">
+      </div>
+      <div class="field row-city">
+        <div>
+          <label for="event_city">City</label>
+          <input type="text" id="event_city" name="event_city" maxlength="80" autocomplete="address-level2">
+        </div>
+        <div>
+          <label for="event_state">State</label>
+          <select id="event_state" name="event_state">
+            <option value="">State</option>
+            <option value="AL">Alabama</option>
+            <option value="AK">Alaska</option>
+            <option value="AZ">Arizona</option>
+            <option value="AR">Arkansas</option>
+            <option value="CA">California</option>
+            <option value="CO">Colorado</option>
+            <option value="CT">Connecticut</option>
+            <option value="DE">Delaware</option>
+            <option value="DC">District of Columbia</option>
+            <option value="FL">Florida</option>
+            <option value="GA">Georgia</option>
+            <option value="HI">Hawaii</option>
+            <option value="ID">Idaho</option>
+            <option value="IL">Illinois</option>
+            <option value="IN">Indiana</option>
+            <option value="IA">Iowa</option>
+            <option value="KS">Kansas</option>
+            <option value="KY">Kentucky</option>
+            <option value="LA">Louisiana</option>
+            <option value="ME">Maine</option>
+            <option value="MD">Maryland</option>
+            <option value="MA">Massachusetts</option>
+            <option value="MI">Michigan</option>
+            <option value="MN">Minnesota</option>
+            <option value="MS">Mississippi</option>
+            <option value="MO">Missouri</option>
+            <option value="MT">Montana</option>
+            <option value="NE">Nebraska</option>
+            <option value="NV">Nevada</option>
+            <option value="NH">New Hampshire</option>
+            <option value="NJ">New Jersey</option>
+            <option value="NM">New Mexico</option>
+            <option value="NY">New York</option>
+            <option value="NC">North Carolina</option>
+            <option value="ND">North Dakota</option>
+            <option value="OH">Ohio</option>
+            <option value="OK">Oklahoma</option>
+            <option value="OR">Oregon</option>
+            <option value="PA">Pennsylvania</option>
+            <option value="RI">Rhode Island</option>
+            <option value="SC">South Carolina</option>
+            <option value="SD">South Dakota</option>
+            <option value="TN">Tennessee</option>
+            <option value="TX">Texas</option>
+            <option value="UT">Utah</option>
+            <option value="VT">Vermont</option>
+            <option value="VA">Virginia</option>
+            <option value="WA">Washington</option>
+            <option value="WV">West Virginia</option>
+            <option value="WI">Wisconsin</option>
+            <option value="WY">Wyoming</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="event-type-group" role="radiogroup" aria-labelledby="event-type-label">
+        <span class="label" id="event-type-label">What kind of event?</span>
+        <div class="chips">
+          <label><input type="radio" name="event_type" value="Market or fair"><span>Market or fair</span></label>
+          <label><input type="radio" name="event_type" value="Church"><span>Church</span></label>
+          <label><input type="radio" name="event_type" value="School"><span>School</span></label>
+          <label><input type="radio" name="event_type" value="Outreach"><span>Outreach</span></label>
+          <label><input type="radio" name="event_type" value="Conference"><span>Conference</span></label>
+          <label><input type="radio" name="event_type" value="Other"><span>Other</span></label>
+        </div>
+      </div>
+      <div class="field hidden" id="event-type-other-wrap">
+        <label for="event_type_other">What kind of event was it?</label>
+        <input type="text" id="event_type_other" name="event_type_other" maxlength="80" placeholder="Women's conference booth">
+      </div>
+
+      <div class="field">
+        <label for="attendance">About how many people came? <span class="opt">(optional)</span></label>
+        <input type="text" id="attendance" name="attendance" inputmode="numeric" maxlength="7" class="num" placeholder="0">
+      </div>
+    </section>
+
+    
+    <section class="card" aria-labelledby="h-terms">
+      <h2 id="h-terms"><span class="n">2</span>How you got the items</h2>
+      <p class="help">Pick the one that fits what you sold at this event.</p>
+      <div id="terms-group" role="radiogroup" aria-labelledby="h-terms">
+        <label class="choice"><input type="radio" name="terms" value="Consignment"><span><b>On consignment from SOAP</b><small>SOAP sent them and is paid from what sold.</small></span></label>
+        <label class="choice"><input type="radio" name="terms" value="Bought outright"><span><b>Bought from SOAP</b><small>You paid SOAP for them before the event.</small></span></label>
+      </div>
+      <div class="field hidden" id="paid-wrap">
+        <label for="paid_for_stock">What did you pay SOAP for them?</label>
+        <p class="help fhelp" id="paid_for_stock_help">The total on SOAP's invoice. Leave out books you paid Theresa for directly.</p>
+        <div class="money-in"><input type="text" id="paid_for_stock" name="paid_for_stock" inputmode="decimal" class="num" placeholder="0.00" aria-describedby="paid_for_stock_help"></div>
+      </div>
+    </section>
+
+    
+    <section class="card" aria-labelledby="h-items">
+      <h2 id="h-items"><span class="n">3</span>Your items</h2>
+      <p class="help">One card for each item you brought. Count what came home, so sold, given away and left over add up to what you received.</p>
+
+      <div id="items"></div>
+      <button type="button" class="add" id="add-item">+ Add another item</button>
+
+      <label class="check"><input type="checkbox" id="no_items" name="no_items"><span>We had nothing for sale at this event</span></label>
+
+      <div class="totals">
+        <div class="big"><span>Item sales from your list</span><span id="t-item-sales">$0.00</span></div>
+        <div><span>Units sold</span><span id="t-units-sold">0</span></div>
+        <div><span>Units given away</span><span id="t-units-given">0</span></div>
+      </div>
+    </section>
+
+    
+    <section class="card" aria-labelledby="h-money">
+      <h2 id="h-money"><span class="n">4</span>Money in</h2>
+      <p class="help">Put each dollar in one box. Sales are money for items. Donations are gifts. If the cash box held both, take the sales from your item list and the rest is donations.</p>
+
+      <div class="grid-money" id="money-grid">
+        <span></span><span class="hd">Sales</span><span class="hd">Donations</span>
+        <label class="m" for="m_cash_sales">Cash</label><div class="money-in"><input type="text" id="m_cash_sales" inputmode="decimal" class="num" placeholder="0.00" aria-label="Cash sales"></div><div class="money-in"><input type="text" id="m_cash_donations" inputmode="decimal" class="num" placeholder="0.00" aria-label="Cash donations"></div>
+        <label class="m" for="m_venmo_sales">Venmo</label><div class="money-in"><input type="text" id="m_venmo_sales" inputmode="decimal" class="num" placeholder="0.00" aria-label="Venmo sales"></div><div class="money-in"><input type="text" id="m_venmo_donations" inputmode="decimal" class="num" placeholder="0.00" aria-label="Venmo donations"></div>
+        <label class="m" for="m_card_sales">Card</label><div class="money-in"><input type="text" id="m_card_sales" inputmode="decimal" class="num" placeholder="0.00" aria-label="Card sales"></div><div class="money-in"><input type="text" id="m_card_donations" inputmode="decimal" class="num" placeholder="0.00" aria-label="Card donations"></div>
+        <label class="m" for="m_check_sales">Check</label><div class="money-in"><input type="text" id="m_check_sales" inputmode="decimal" class="num" placeholder="0.00" aria-label="Check sales"></div><div class="money-in"><input type="text" id="m_check_donations" inputmode="decimal" class="num" placeholder="0.00" aria-label="Check donations"></div>
+        <label class="m" for="m_online_sales">Online<small>store or donate page</small></label><div class="money-in"><input type="text" id="m_online_sales" inputmode="decimal" class="num" placeholder="0.00" aria-label="Online sales"></div><div class="money-in"><input type="text" id="m_online_donations" inputmode="decimal" class="num" placeholder="0.00" aria-label="Online donations"></div>
+        <span class="m">Total</span><span class="tot" id="t-sales">$0.00</span><span class="tot" id="t-donations">$0.00</span>
+      </div>
+
+      <div class="totals">
+        <div class="big"><span>Money in</span><span id="t-money-in">$0.00</span></div>
+      </div>
+
+      <div id="sales-check" class="status wait" aria-live="polite">Add your items and money to check they match.</div>
+
+      <div class="field hidden" id="gap-wrap">
+        <label for="sales_gap_reason">Why is it different?</label>
+        <textarea id="sales_gap_reason" name="sales_gap_reason" maxlength="300" placeholder="One Venmo payment covered a shirt and a gift."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="cash_sent_how">How did the cash get to SOAP?</label>
+        <select id="cash_sent_how" name="cash_sent_how">
+          <option value="">Choose one</option>
+          <option>Sent it by Venmo</option>
+          <option>Mailed a check</option>
+          <option>Deposited it for SOAP</option>
+          <option>Handed it to SOAP staff</option>
+          <option>Not sent yet</option>
+          <option>No cash came in</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="chapter_kept">Did your chapter keep any of this money? <span class="opt">(optional)</span></label>
+        <p class="help fhelp" id="chapter_kept_help">For example, your chapter's share. Leave it blank if all of it went to SOAP.</p>
+        <div class="money-in"><input type="text" id="chapter_kept" name="chapter_kept" inputmode="decimal" class="num" placeholder="0.00" aria-describedby="chapter_kept_help"></div>
+      </div>
+      <div class="field">
+        <label for="memo">Memo you used on Venmo or online <span class="opt">(optional)</span></label>
+        <input type="text" id="memo" name="memo" maxlength="80" placeholder="Boise outreach">
+      </div>
+    </section>
+
+    
+    <section class="card" aria-labelledby="h-exp">
+      <h2 id="h-exp"><span class="n">5</span>Expenses your chapter paid</h2>
+      <p class="help">Leave a box blank if there was none.</p>
+      <div class="row2">
+        <div class="field">
+          <label for="exp_booth">Booth fee</label>
+          <div class="money-in"><input type="text" id="exp_booth" name="exp_booth" inputmode="decimal" class="num" placeholder="0.00"></div>
+        </div>
+        <div class="field">
+          <label for="exp_supplies">Supplies</label>
+          <div class="money-in"><input type="text" id="exp_supplies" name="exp_supplies" inputmode="decimal" class="num" placeholder="0.00"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="exp_other">Other</label>
+        <div class="money-in"><input type="text" id="exp_other" name="exp_other" inputmode="decimal" class="num" placeholder="0.00"></div>
+      </div>
+      <div class="field hidden" id="exp-other-wrap">
+        <label for="exp_other_what">What was the other expense?</label>
+        <input type="text" id="exp_other_what" name="exp_other_what" maxlength="120" placeholder="Table rental">
+      </div>
+      <div class="totals"><div class="big"><span>Expenses</span><span id="t-expenses">$0.00</span></div></div>
+    </section>
+
+    
+    <section class="card" aria-labelledby="h-went">
+      <h2 id="h-went"><span class="n">6</span>How it went</h2>
+      <p class="help">A line or two each is plenty.</p>
+      <div class="field">
+        <label for="sold_best">What sold best?</label>
+        <textarea id="sold_best" name="sold_best" maxlength="300" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label for="sold_worst">What did not sell?</label>
+        <textarea id="sold_worst" name="sold_worst" maxlength="300" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label for="asked_for">What did people ask for that you did not have?</label>
+        <textarea id="asked_for" name="asked_for" maxlength="300" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label for="change_next">One thing to change next time</label>
+        <textarea id="change_next" name="change_next" maxlength="300" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label for="sent_to_store">How many people did you send to the online store? <span class="opt">(optional)</span></label>
+        <input type="text" id="sent_to_store" name="sent_to_store" inputmode="numeric" maxlength="5" class="num" placeholder="0">
+      </div>
+      <div class="field">
+        <label for="brochures_out">About how many brochures went out? <span class="opt">(optional)</span></label>
+        <input type="text" id="brochures_out" name="brochures_out" inputmode="numeric" maxlength="6" class="num" placeholder="0">
+      </div>
+      <label class="check"><input type="checkbox" id="brochures_ran_out" name="brochures_ran_out"><span>We ran out of brochures</span></label>
+      <div class="field">
+        <label for="notes">Anything else SOAP should know? <span class="opt">(optional)</span></label>
+        <textarea id="notes" name="notes" maxlength="600" rows="3" placeholder="A big gift, a new contact, a problem at the table"></textarea>
+      </div>
+    </section>
+
+    
+    <section class="card" aria-labelledby="h-photos">
+      <h2 id="h-photos"><span class="n">7</span>Photos</h2>
+      <div class="field">
+        <label for="photos_link">Link to your photos <span class="opt">(optional)</span></label>
+        <input type="url" id="photos_link" name="photos_link" inputmode="url" maxlength="400" placeholder="Google Photos, Dropbox or Drive link">
+      </div>
+      <label class="check"><input type="checkbox" id="photos_ok" name="photos_ok"><span>SOAP may share these photos on social media.</span></label>
+    </section>
+
+    
+    <section class="card" aria-labelledby="h-send">
+      <h2 id="h-send"><span class="n">8</span>Send it</h2>
+      <div class="totals">
+        <div><span>Item sales</span><span id="s-item-sales">$0.00</span></div>
+        <div><span>Donations</span><span id="s-donations">$0.00</span></div>
+        <div><span>Expenses</span><span id="s-expenses">$0.00</span></div>
+        <div class="big"><span>Money in</span><span id="s-money-in">$0.00</span></div>
+      </div>
+      <div id="problems" class="problems hidden" role="alert" tabindex="-1"></div>
+      <button type="submit" class="send" id="send">Send report to SOAP</button>
+      <p class="fine">If the report cannot reach SOAP, you will get a ready to send email instead. Nothing you typed is lost.</p>
+    </section>
+  </form>
+
+  
+  <section id="fallback" class="panel hidden" tabindex="-1" aria-labelledby="h-fallback">
+    <h2 id="h-fallback">One more step. Email this to SOAP.</h2>
+    <p>Your report did not reach SOAP's records yet. Nothing is lost. Tap the button and an email to Theresa opens with everything filled in. Then just hit send.</p>
+    <a class="btn" id="fallback-mail" href="#">Email my report</a>
+    <p class="fine">No email app on this phone? Copy the text below and send it to <a id="fallback-addr" href="#">theresa@soapproject.org</a> any way you like.</p>
+    <textarea class="copybox" id="fallback-text" readonly></textarea>
+    <button type="button" class="btn ghost" id="fallback-copy">Copy the report</button>
+    <button type="button" class="linkish" id="fallback-done">I sent it. Clear this report.</button>
+  </section>
+
+  
+  <section id="done" class="panel hidden" tabindex="-1" aria-labelledby="h-done">
+    <img class="mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMzAwIDU5NiIgd2lkdGg9IjEzMDAiIGhlaWdodD0iNTk2Ij48cGF0aCBmaWxsPSIjMDAwMDAwIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw2NTAuNDAwNCwzNzIuOTI4MjMpIiBkPSJNMCAwQzAgMC00Mi4yNyAxMDcuMDg2LTI0My43NTQgMTcwLjQ5MS0zODguMTYyIDIxNS45MzEtNTE4LjUwOCAyNTYuNDM2LTYwNS44NjUgMzY0LjkyOC02MDUuODY1IDM2NC45MjgtNTI0LjE0MyAyMDQuMzAyLTM3MS45NjkgMTY2LjI2MS0yMTkuODAyIDEyOC4yMjEtNjcuNjI4IDkxLjU4NiAwIDAiLz48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw2MDguMTMwOSwzNDguOTc2MSkiIGQ9Ik0wIDBDMCAwLTExMi4zMTggNzkuMzc3LTI1Ny44NDMgOTAuMTc1LTQwNi44NTIgMTAxLjIzNy01MjQuOTU2IDE5MS44NTMtNjAwLjIzIDI1MC44MDEtNjAwLjIzIDI1MC44MDEtNDc5LjA1NiAxMjUuNDA0LTM1OC43MjcgNTIuMTYtMTg4LjQ4MS01MS40NjYtOTIuOTkzIDYxLjk5OSAwIDAiIGZpbGw9IiNjMTA2MjEiLz48cGF0aCBmaWxsPSIjMDAwMDAwIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw2NTAuNDAwNCw1ODUuNjgzNikiIGQ9Ik0wIDBDMCAwIDAgMzMuMTEyLTc2LjA4NyA5NC40MDUtMTQ5Ljk0MiAxNTMuOTAxLTE2NC4xNDQgMjIyLjI3OS04Ni42NDYgMjQxLjMwMy0xMjIuNTggMjUyLjIwOC0zMDIuOTMgMTg4LjEwMy00MjEuOTkyIDI1NS43MzEtNDIxLjk5MiAyNTUuNzMxLTM2OS4xNDYgMjA1LjcxNC0yNDQuMjIxIDE1Ni4zOTctOTguMzI1IDk4LjgwNS0xMS42MjMgNTAuMzcgMCAwIi8+PHBhdGggZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNjI1LjUwODgsNTY3LjM2NTcpIiBkPSJNMCAwQzAgMC04NS4wMTMgMTAyLjgwNy0yNDkuODYyIDYzLjM1NC0yNDkuODYyIDYzLjM1NC0xODguNjE5IDYwLjkyOC0xMTEuMzEgNDAuMzg1LTMxLjk5NiAxOS4zMTMgMCAwIDAgMCIvPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY1MC41MDEsMzcyLjkyODIzKSIgZD0iTTAgMEMwIDAgNDIuMjcgMTA3LjA4NiAyNDMuNzU0IDE3MC40OTEgMzg4LjE2MiAyMTUuOTMxIDUxOC41MDggMjU2LjQzNiA2MDUuODY1IDM2NC45MjggNjA1Ljg2NSAzNjQuOTI4IDUyNC4xNDMgMjA0LjMwMiAzNzEuOTY5IDE2Ni4yNjEgMjE5LjgwMiAxMjguMjIxIDY3LjYyOCA5MS41ODYgMCAwIi8+PHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNjkyLjc3MDUsMzQ4Ljk3NjEpIiBkPSJNMCAwQzAgMCAxMTIuMzE4IDc5LjM3NyAyNTcuODQyIDkwLjE3NSA0MDYuODUyIDEwMS4yMzcgNTI0Ljk1NiAxOTEuODUzIDYwMC4yMjkgMjUwLjgwMSA2MDAuMjI5IDI1MC44MDEgNDc5LjA1NiAxMjUuNDA0IDM1OC43MjcgNTIuMTYgMTg4LjQ4LTUxLjQ2NiA5Mi45OTIgNjEuOTk5IDAgMCIgZmlsbD0iI2MxMDYyMSIvPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY1MC41MDEsNTg1LjY4MzYpIiBkPSJNMCAwQzAgMCAwIDMzLjExMiA3Ni4wODcgOTQuNDA1IDE0OS45NDIgMTUzLjkwMSAxNjQuMTQ0IDIyMi4yNzkgODYuNjQ1IDI0MS4zMDMgMTIyLjU4IDI1Mi4yMDggMzAyLjkzIDE4OC4xMDMgNDIxLjk5MiAyNTUuNzMxIDQyMS45OTIgMjU1LjczMSAzNjkuMTQ2IDIwNS43MTQgMjQ0LjIyMSAxNTYuMzk3IDk4LjMyNSA5OC44MDUgMTEuNjIzIDUwLjM3IDAgMCIvPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY3NS4zOTI2LDU2Ny4zNjU3KSIgZD0iTTAgMEMwIDAgODUuMDEzIDEwMi44MDcgMjQ5Ljg2MiA2My4zNTQgMjQ5Ljg2MiA2My4zNTQgMTg4LjYxOSA2MC45MjggMTExLjMxIDQwLjM4NSAzMS45OTUgMTkuMzEzIDAgMCAwIDAiLz48L3N2Zz4=" alt="" width="120" height="55">
+    <h2 id="h-done">Report received</h2>
+    <p>Thank you. SOAP has your report from <b id="done-event"></b>.</p>
+    <p>Report number <span class="rid" id="done-id"></span></p>
+    <p class="fine">Keep a copy for your records if you like.</p>
+    <textarea class="copybox" id="done-text" readonly></textarea>
+    <button type="button" class="btn ghost" id="done-new">Start a new report</button>
+  </section>
+
+  <footer>
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMzAwIDU5NiIgd2lkdGg9IjEzMDAiIGhlaWdodD0iNTk2Ij48cGF0aCBmaWxsPSIjMDAwMDAwIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw2NTAuNDAwNCwzNzIuOTI4MjMpIiBkPSJNMCAwQzAgMC00Mi4yNyAxMDcuMDg2LTI0My43NTQgMTcwLjQ5MS0zODguMTYyIDIxNS45MzEtNTE4LjUwOCAyNTYuNDM2LTYwNS44NjUgMzY0LjkyOC02MDUuODY1IDM2NC45MjgtNTI0LjE0MyAyMDQuMzAyLTM3MS45NjkgMTY2LjI2MS0yMTkuODAyIDEyOC4yMjEtNjcuNjI4IDkxLjU4NiAwIDAiLz48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw2MDguMTMwOSwzNDguOTc2MSkiIGQ9Ik0wIDBDMCAwLTExMi4zMTggNzkuMzc3LTI1Ny44NDMgOTAuMTc1LTQwNi44NTIgMTAxLjIzNy01MjQuOTU2IDE5MS44NTMtNjAwLjIzIDI1MC44MDEtNjAwLjIzIDI1MC44MDEtNDc5LjA1NiAxMjUuNDA0LTM1OC43MjcgNTIuMTYtMTg4LjQ4MS01MS40NjYtOTIuOTkzIDYxLjk5OSAwIDAiIGZpbGw9IiNjMTA2MjEiLz48cGF0aCBmaWxsPSIjMDAwMDAwIiB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw2NTAuNDAwNCw1ODUuNjgzNikiIGQ9Ik0wIDBDMCAwIDAgMzMuMTEyLTc2LjA4NyA5NC40MDUtMTQ5Ljk0MiAxNTMuOTAxLTE2NC4xNDQgMjIyLjI3OS04Ni42NDYgMjQxLjMwMy0xMjIuNTggMjUyLjIwOC0zMDIuOTMgMTg4LjEwMy00MjEuOTkyIDI1NS43MzEtNDIxLjk5MiAyNTUuNzMxLTM2OS4xNDYgMjA1LjcxNC0yNDQuMjIxIDE1Ni4zOTctOTguMzI1IDk4LjgwNS0xMS42MjMgNTAuMzcgMCAwIi8+PHBhdGggZmlsbD0iIzAwMDAwMCIgdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNjI1LjUwODgsNTY3LjM2NTcpIiBkPSJNMCAwQzAgMC04NS4wMTMgMTAyLjgwNy0yNDkuODYyIDYzLjM1NC0yNDkuODYyIDYzLjM1NC0xODguNjE5IDYwLjkyOC0xMTEuMzEgNDAuMzg1LTMxLjk5NiAxOS4zMTMgMCAwIDAgMCIvPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY1MC41MDEsMzcyLjkyODIzKSIgZD0iTTAgMEMwIDAgNDIuMjcgMTA3LjA4NiAyNDMuNzU0IDE3MC40OTEgMzg4LjE2MiAyMTUuOTMxIDUxOC41MDggMjU2LjQzNiA2MDUuODY1IDM2NC45MjggNjA1Ljg2NSAzNjQuOTI4IDUyNC4xNDMgMjA0LjMwMiAzNzEuOTY5IDE2Ni4yNjEgMjE5LjgwMiAxMjguMjIxIDY3LjYyOCA5MS41ODYgMCAwIi8+PHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNjkyLjc3MDUsMzQ4Ljk3NjEpIiBkPSJNMCAwQzAgMCAxMTIuMzE4IDc5LjM3NyAyNTcuODQyIDkwLjE3NSA0MDYuODUyIDEwMS4yMzcgNTI0Ljk1NiAxOTEuODUzIDYwMC4yMjkgMjUwLjgwMSA2MDAuMjI5IDI1MC44MDEgNDc5LjA1NiAxMjUuNDA0IDM1OC43MjcgNTIuMTYgMTg4LjQ4LTUxLjQ2NiA5Mi45OTIgNjEuOTk5IDAgMCIgZmlsbD0iI2MxMDYyMSIvPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY1MC41MDEsNTg1LjY4MzYpIiBkPSJNMCAwQzAgMCAwIDMzLjExMiA3Ni4wODcgOTQuNDA1IDE0OS45NDIgMTUzLjkwMSAxNjQuMTQ0IDIyMi4yNzkgODYuNjQ1IDI0MS4zMDMgMTIyLjU4IDI1Mi4yMDggMzAyLjkzIDE4OC4xMDMgNDIxLjk5MiAyNTUuNzMxIDQyMS45OTIgMjU1LjczMSAzNjkuMTQ2IDIwNS43MTQgMjQ0LjIyMSAxNTYuMzk3IDk4LjMyNSA5OC44MDUgMTEuNjIzIDUwLjM3IDAgMCIvPjxwYXRoIGZpbGw9IiMwMDAwMDAiIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY3NS4zOTI2LDU2Ny4zNjU3KSIgZD0iTTAgMEMwIDAgODUuMDEzIDEwMi44MDcgMjQ5Ljg2MiA2My4zNTQgMjQ5Ljg2MiA2My4zNTQgMTg4LjYxOSA2MC45MjggMTExLjMxIDQwLjM4NSAzMS45OTUgMTkuMzEzIDAgMCAwIDAiLz48L3N2Zz4=" alt="" width="64" height="29">
+    The SOAP Project<br>
+    Questions? <a href="mailto:theresa@soapproject.org">theresa@soapproject.org</a>
+  </footer>
+</main>
+
+<div class="bar" id="bar" aria-live="polite">
+  <div class="in">
+    <div><div class="k">Item sales</div><div class="v" id="b-sales">$0.00</div></div>
+    <div><div class="k">Donations</div><div class="v" id="b-donations">$0.00</div></div>
+    <div><div class="k">Item counts</div><div class="v" id="b-items">No items yet</div></div>
+  </div>
+</div>
+
+<template id="item-tpl">
+  <div class="item">
+    <div class="item-head">
+      <strong class="item-title">Item 1</strong>
+      <button type="button" class="linkish it-remove">Remove</button>
+    </div>
+    <div class="field">
+      <label>What was it?</label>
+      <select class="it-item">
+        <option value="">Choose an item</option>
+        <optgroup label="Books"><option value="The Slave Across the Street (book)">The Slave Across the Street (book)</option><option value="Slavery in the Land of the Free (book)">Slavery in the Land of the Free (book)</option></optgroup>
+        <optgroup label="Apparel"><option value="Bocce SOAP shirt">Bocce SOAP shirt</option><option value="Black crewneck shirt, short sleeve">Black crewneck shirt, short sleeve</option><option value="White or black baseball V-neck">White or black baseball V-neck</option><option value="Gray long sleeve shirt">Gray long sleeve shirt</option><option value="Beanie">Beanie</option><option value="Bracelet">Bracelet</option></optgroup>
+        <optgroup label="Made by survivors"><option value="Soul reflector">Soul reflector</option><option value="Soul reflector key chain">Soul reflector key chain</option><option value="Survivor-made soap">Survivor-made soap</option></optgroup>
+        <option value="__other">Something else</option>
+      </select>
+    </div>
+    <div class="field it-other-wrap hidden">
+      <label>Item name</label>
+      <input type="text" class="it-other" maxlength="80" placeholder="Coffee">
+    </div>
+    <div class="field">
+      <label>How many did you receive?</label>
+      <input type="text" class="it-received num" inputmode="numeric" maxlength="5" placeholder="0">
+    </div>
+    <div class="field">
+      <span class="label">How many sold, and at what price?</span>
+      <p class="listprice it-list hidden"></p>
+      <div class="it-lines"></div>
+      <button type="button" class="linkish it-addline">+ Sold some at a different price</button>
+    </div>
+    <div class="field">
+      <span class="label">Given away</span>
+      <div class="give">
+        <div><label>Volunteers</label><input type="text" class="it-gv num" inputmode="numeric" maxlength="5" placeholder="0"></div>
+        <div><label>Donors</label><input type="text" class="it-gd num" inputmode="numeric" maxlength="5" placeholder="0"></div>
+        <div><label>Others</label><input type="text" class="it-go num" inputmode="numeric" maxlength="5" placeholder="0"></div>
+      </div>
+    </div>
+    <div class="field it-gow-wrap hidden">
+      <label>Who were the others?</label>
+      <input type="text" class="it-gow" maxlength="120" placeholder="Event organizers">
+    </div>
+    <div class="field">
+      <label>How many left over?</label>
+      <input type="text" class="it-left num" inputmode="numeric" maxlength="5" placeholder="0">
+    </div>
+    <div class="status wait it-status" aria-live="polite">Choose an item and enter how many you received.</div>
+    <p class="item-sales">Sales for this item <b class="it-sales">$0.00</b></p>
+  </div>
+</template>
+
+<template id="line-tpl">
+  <div class="line">
+    <input type="text" class="pl-qty num" inputmode="numeric" maxlength="5" placeholder="0" aria-label="How many sold at this price">
+    <span class="word">sold at</span>
+    <div class="money-in"><input type="text" class="pl-price num" inputmode="decimal" maxlength="8" placeholder="0.00" aria-label="Price each"></div>
+    <button type="button" class="x pl-remove" aria-label="Remove this price">&times;</button>
+  </div>
+</template>
+
+<script>
+"use strict";
+
+const WEB_APP_URL = "";
+
+const SOAP_EMAIL = "theresa@soapproject.org";
+const SUBMIT_TIMEOUT_MS = 15000;
+const FORM_VERSION = "2026-11-16";
+const DRAFT_KEY = "soap-chapter-report-draft-v1";
+const OTHER = "__other";
+const UNLISTED = "__unlisted";
+
+const ITEMS = [{"name": "The Slave Across the Street (book)", "group": "Books", "list": 20.0, "hint": "Sold in the 2 for $30 special? Enter those at $15 each."}, {"name": "Slavery in the Land of the Free (book)", "group": "Books", "list": 15.0, "hint": "Sold in the 2 for $30 special? Enter those at $15 each."}, {"name": "Bocce SOAP shirt", "group": "Apparel", "list": 15.0, "hint": ""}, {"name": "Black crewneck shirt, short sleeve", "group": "Apparel", "list": 20.0, "hint": ""}, {"name": "White or black baseball V-neck", "group": "Apparel", "list": 25.0, "hint": ""}, {"name": "Gray long sleeve shirt", "group": "Apparel", "list": 30.0, "hint": ""}, {"name": "Beanie", "group": "Apparel", "list": 20.0, "hint": ""}, {"name": "Bracelet", "group": "Apparel", "list": 25.0, "hint": ""}, {"name": "Soul reflector", "group": "Made by survivors", "list": 25.0, "hint": ""}, {"name": "Soul reflector key chain", "group": "Made by survivors", "list": 10.0, "hint": ""}, {"name": "Survivor-made soap", "group": "Made by survivors", "list": null, "hint": ""}];
+const METHODS = [["cash", "Cash"], ["venmo", "Venmo"], ["card", "Card"], ["check", "Check"], ["online", "Online"]];
+const BOUGHT = "Bought outright";
+
+const LIST_PRICE = {};
+const HINT = {};
+ITEMS.forEach(function (it) { LIST_PRICE[it.name] = it.list; HINT[it.name] = it.hint || ""; });
+
+let reportId = "";
+
+function $(id) { return document.getElementById(id); }
+function all(root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
+function clean(v) { return String(v == null ? "" : v).trim(); }
+function cents(n) { return Math.round(n * 100) / 100; }
+function fmt(n) {
+  return "$" + cents(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function plural(n, one, many) { return n + " " + (n === 1 ? one : many); }
+
+function parseNum(raw, whole) {
+  const s = clean(raw).replace(/[$,\s]/g, "");
+  if (s === "") return { blank: true, ok: true, val: 0 };
+  if (!/^\d*\.?\d*$/.test(s) || s === ".") return { blank: false, ok: false, val: 0 };
+  const v = Number(s);
+  if (!isFinite(v) || v > 1000000) return { blank: false, ok: false, val: 0 };
+  if (whole && Math.floor(v) !== v) return { blank: false, ok: false, val: 0 };
+  return { blank: false, ok: true, val: whole ? v : cents(v) };
+}
+
+function newReportId() {
+  const d = new Date();
+  const ymd = d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+  const chars = "abcdefghjkmnpqrstuvwxyz23456789";
+  let tail = "";
+  const bytes = new Uint8Array(6);
+  (window.crypto || window.msCrypto).getRandomValues(bytes);
+  bytes.forEach(function (b) { tail += chars[b % chars.length]; });
+  return "R-" + ymd + "-" + tail;
+}
+
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+
+
+const itemsBox = $("items");
+
+function addLine(card, data) {
+  const linesBox = card.querySelector(".it-lines");
+  if (linesBox.children.length >= 4) return null;
+  const line = $("line-tpl").content.firstElementChild.cloneNode(true);
+  if (data) {
+    line.querySelector(".pl-qty").value = data.qty || "";
+    line.querySelector(".pl-price").value = data.price || "";
+  }
+  line.querySelector(".pl-remove").addEventListener("click", function () {
+    line.remove();
+    refreshLines(card);
+    changed();
+  });
+  linesBox.appendChild(line);
+  refreshLines(card);
+  return line;
+}
+
+function refreshLines(card) {
+  const lines = all(card, ".line");
+  lines.forEach(function (l, i) {
+    l.querySelector(".pl-remove").style.visibility = lines.length > 1 ? "visible" : "hidden";
+  });
+  card.querySelector(".it-addline").classList.toggle("hidden", lines.length >= 4);
+}
+
+function addItem(data) {
+  const card = $("item-tpl").content.firstElementChild.cloneNode(true);
+  const sel = card.querySelector(".it-item");
+  sel.addEventListener("change", function () { showItemExtras(card); changed(); });
+  card.querySelector(".it-go").addEventListener("input", function () { showItemExtras(card); });
+  card.querySelector(".it-addline").addEventListener("click", function () {
+    const line = addLine(card);
+    if (line) line.querySelector(".pl-qty").focus();
+    changed();
+  });
+  card.querySelector(".it-remove").addEventListener("click", function () {
+    const typed = all(card, "input").some(function (i) { return clean(i.value) !== ""; }) || sel.value !== "";
+    if (typed && !window.confirm("Remove this item from the report?")) return;
+    card.remove();
+    renumber();
+    changed();
+  });
+  if (data) {
+    sel.value = data.sel || "";
+    if (sel.value !== (data.sel || "")) sel.value = "";
+    card.querySelector(".it-other").value = data.other || "";
+    card.querySelector(".it-received").value = data.received || "";
+    card.querySelector(".it-gv").value = data.gv || "";
+    card.querySelector(".it-gd").value = data.gd || "";
+    card.querySelector(".it-go").value = data.go || "";
+    card.querySelector(".it-gow").value = data.gow || "";
+    card.querySelector(".it-left").value = data.left || "";
+    (data.lines && data.lines.length ? data.lines : [{}]).forEach(function (l) { addLine(card, l); });
+  } else {
+    addLine(card);
+  }
+  itemsBox.appendChild(card);
+  showItemExtras(card);
+  renumber();
+  return card;
+}
+
+function showItemExtras(card) {
+  const sel = card.querySelector(".it-item").value;
+  card.querySelector(".it-other-wrap").classList.toggle("hidden", sel !== OTHER);
+  const lp = card.querySelector(".it-list");
+  const price = LIST_PRICE[sel];
+  const hint = sel && sel !== OTHER ? (HINT[sel] || "") : "";
+  const words = [];
+  if (sel && sel !== OTHER && typeof price === "number") words.push("List price " + fmt(price) + " each.");
+  if (hint) words.push(hint);
+  lp.textContent = words.join(" ");
+  lp.classList.toggle("hidden", words.length === 0);
+  const go = parseNum(card.querySelector(".it-go").value, true);
+  card.querySelector(".it-gow-wrap").classList.toggle("hidden", !(go.ok && go.val > 0));
+}
+
+function renumber() {
+  all(itemsBox, ".item").forEach(function (card, i) {
+    card.querySelector(".item-title").textContent = "Item " + (i + 1);
+  });
+}
+
+function readItem(card) {
+  const sel = card.querySelector(".it-item").value;
+  const other = clean(card.querySelector(".it-other").value);
+  const lines = all(card, ".line").map(function (l) {
+    return {
+      el: l,
+      qty: parseNum(l.querySelector(".pl-qty").value, true),
+      price: parseNum(l.querySelector(".pl-price").value, false)
+    };
+  });
+  const r = {
+    card: card,
+    sel: sel,
+    name: sel === OTHER ? other : sel,
+    other: other,
+    received: parseNum(card.querySelector(".it-received").value, true),
+    lines: lines,
+    gv: parseNum(card.querySelector(".it-gv").value, true),
+    gd: parseNum(card.querySelector(".it-gd").value, true),
+    go: parseNum(card.querySelector(".it-go").value, true),
+    gow: clean(card.querySelector(".it-gow").value),
+    left: parseNum(card.querySelector(".it-left").value, true)
+  };
+  r.sold = lines.reduce(function (a, l) { return a + (l.qty.ok ? l.qty.val : 0); }, 0);
+  r.sales = cents(lines.reduce(function (a, l) {
+    return a + (l.qty.ok && l.price.ok ? l.qty.val * l.price.val : 0);
+  }, 0));
+  r.given = (r.gv.ok ? r.gv.val : 0) + (r.gd.ok ? r.gd.val : 0) + (r.go.ok ? r.go.val : 0);
+  r.leftVal = r.left.ok ? r.left.val : 0;
+  r.counted = r.sold + r.given + r.leftVal;
+  r.numbersOk = r.received.ok && r.gv.ok && r.gd.ok && r.go.ok && r.left.ok &&
+    lines.every(function (l) { return l.qty.ok && l.price.ok; });
+  r.empty = !sel && r.received.blank && r.sold === 0 && r.given === 0 && r.left.blank;
+  r.addsUp = r.numbersOk && !r.received.blank && r.received.val > 0 && r.counted === r.received.val;
+  return r;
+}
+
+function itemStatus(r) {
+  if (!r.numbersOk) return ["bad", "Use whole numbers for counts and dollars for prices."];
+  if (r.received.blank) return ["wait", "Enter how many you received."];
+  if (r.received.val === 0) return ["bad", "How many you received has to be at least 1."];
+  const parts = r.sold + " sold, " + r.given + " given away, " + r.leftVal + " left over";
+  if (r.addsUp) return ["ok", "Adds up. " + parts + " = " + r.received.val + " received."];
+  const gap = r.received.val - r.counted;
+  if (gap > 0) {
+    return ["bad", plural(gap, "unit is", "units are") + " not counted yet. " + parts + " comes to " + r.counted + ", but you received " + r.received.val + "."];
+  }
+  return ["bad", plural(-gap, "unit", "units") + " too many. " + parts + " comes to " + r.counted + ", but you received " + r.received.val + "."];
+}
+
+
+
+function readMoney() {
+  const out = { rows: {}, sales: 0, donations: 0, bad: [] };
+  METHODS.forEach(function (m) {
+    const s = parseNum($("m_" + m[0] + "_sales").value, false);
+    const d = parseNum($("m_" + m[0] + "_donations").value, false);
+    out.rows[m[0]] = { sales: s, donations: d };
+    if (s.ok) out.sales += s.val; else out.bad.push([$("m_" + m[0] + "_sales"), m[1] + " sales"]);
+    if (d.ok) out.donations += d.val; else out.bad.push([$("m_" + m[0] + "_donations"), m[1] + " donations"]);
+  });
+  out.sales = cents(out.sales);
+  out.donations = cents(out.donations);
+  return out;
+}
+
+function readExpenses() {
+  const b = parseNum($("exp_booth").value, false);
+  const s = parseNum($("exp_supplies").value, false);
+  const o = parseNum($("exp_other").value, false);
+  return { booth: b, supplies: s, other: o, total: cents((b.ok ? b.val : 0) + (s.ok ? s.val : 0) + (o.ok ? o.val : 0)) };
+}
+
+function noItems() { return $("no_items").checked; }
+
+function recalc() {
+  let itemSales = 0, unitsSold = 0, unitsGiven = 0, toFix = 0, counted = 0;
+  const names = {};
+  all(itemsBox, ".item").forEach(function (card) {
+    const r = readItem(card);
+    const st = itemStatus(r);
+    const box = card.querySelector(".it-status");
+    if (r.empty) {
+      box.className = "status wait it-status";
+      box.textContent = "Choose an item and enter how many you received.";
+    } else {
+      box.className = "status " + st[0] + " it-status";
+      box.textContent = st[1];
+    }
+    card.querySelector(".it-sales").textContent = fmt(r.sales);
+    if (!r.empty) {
+      counted++;
+      if (!r.addsUp) toFix++;
+    }
+    itemSales += r.sales;
+    unitsSold += r.sold;
+    unitsGiven += r.given;
+  });
+  itemSales = cents(itemSales);
+  const money = readMoney();
+  const exp = readExpenses();
+  const moneyIn = cents(money.sales + money.donations);
+
+  $("t-item-sales").textContent = fmt(itemSales);
+  $("t-units-sold").textContent = unitsSold;
+  $("t-units-given").textContent = unitsGiven;
+  $("t-sales").textContent = fmt(money.sales);
+  $("t-donations").textContent = fmt(money.donations);
+  $("t-money-in").textContent = fmt(moneyIn);
+  $("t-expenses").textContent = fmt(exp.total);
+  $("s-item-sales").textContent = fmt(itemSales);
+  $("s-donations").textContent = fmt(money.donations);
+  $("s-expenses").textContent = fmt(exp.total);
+  $("s-money-in").textContent = fmt(moneyIn);
+  $("b-sales").textContent = fmt(itemSales);
+  $("b-donations").textContent = fmt(money.donations);
+
+  const bi = $("b-items");
+  if (noItems()) { bi.textContent = "None sold"; bi.className = "v"; }
+  else if (counted === 0) { bi.textContent = "No items yet"; bi.className = "v"; }
+  else if (toFix === 0) { bi.textContent = "All add up"; bi.className = "v ok"; }
+  else { bi.textContent = plural(toFix, "item", "items") + " to fix"; bi.className = "v bad"; }
+
+  const gap = cents(money.sales - itemSales);
+  const chk = $("sales-check");
+  const needReason = Math.abs(gap) >= 1;
+  if (money.sales === 0 && itemSales === 0) {
+    chk.className = "status wait";
+    chk.textContent = "Add your items and money to check they match.";
+  } else if (!needReason) {
+    chk.className = "status ok";
+    chk.textContent = "Sales match your item list, " + fmt(itemSales) + ".";
+  } else {
+    chk.className = "status bad";
+    chk.textContent = "Your item list adds up to " + fmt(itemSales) + " in sales, but you entered " + fmt(money.sales) +
+      " as sales. That is " + fmt(Math.abs(gap)) + (gap > 0 ? " more" : " less") + ". Fix the numbers, or say why below.";
+  }
+  $("gap-wrap").classList.toggle("hidden", !needReason);
+
+  const o = exp.other;
+  $("exp-other-wrap").classList.toggle("hidden", !(o.ok && o.val > 0));
+  $("chapter-other-wrap").classList.toggle("hidden", $("chapter").value !== UNLISTED);
+  $("event-type-other-wrap").classList.toggle("hidden", checkedValue("event_type") !== "Other");
+  $("paid-wrap").classList.toggle("hidden", checkedValue("terms") !== BOUGHT);
+  itemsBox.classList.toggle("hidden", noItems());
+  $("add-item").classList.toggle("hidden", noItems());
+
+  return { itemSales: itemSales, money: money, exp: exp, moneyIn: moneyIn, gap: gap, needReason: needReason };
+}
+
+function checkedValue(name) {
+  const el = document.querySelector('input[name="' + name + '"]:checked');
+  return el ? el.value : "";
+}
+
+
+
+function validate() {
+  all(document, ".bad-field").forEach(function (el) { el.classList.remove("bad-field"); el.removeAttribute("aria-invalid"); });
+  all(document, ".group-bad").forEach(function (el) { el.classList.remove("group-bad"); });
+  const t = recalc();
+  const problems = [];
+  function need(el, msg) { problems.push({ el: el, msg: msg }); }
+  function req(id, msg) { if (!clean($(id).value)) need($(id), msg); }
+
+  req("chapter", "Choose your chapter.");
+  if ($("chapter").value === UNLISTED) req("chapter_other", "Type your chapter's city and state.");
+  req("leader_name", "Enter your name.");
+  const email = clean($("leader_email").value);
+  if (!email) need($("leader_email"), "Enter your email.");
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) need($("leader_email"), "Check your email address.");
+  req("event_name", "Enter the event name.");
+  const date = clean($("event_date").value);
+  if (!date) need($("event_date"), "Enter the event date.");
+  else if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) need($("event_date"), "Check the event date.");
+  else if (date > todayISO()) need($("event_date"), "The event date is in the future. Fill this in after the event.");
+  req("event_city", "Enter the city the event was in.");
+  req("event_state", "Choose the state the event was in.");
+  if (!checkedValue("event_type")) {
+    $("event-type-group").classList.add("group-bad");
+    need(document.querySelector('input[name="event_type"]'), "Choose what kind of event it was.");
+  } else if (checkedValue("event_type") === "Other") {
+    req("event_type_other", "Say what kind of event it was.");
+  }
+  const att = parseNum($("attendance").value, true);
+  if (!att.ok) need($("attendance"), "Attendance has to be a whole number.");
+  if (!checkedValue("terms")) {
+    $("terms-group").classList.add("group-bad");
+    need(document.querySelector('input[name="terms"]'), "Choose how you got the items.");
+  } else if (checkedValue("terms") === BOUGHT) {
+    const paid = parseNum($("paid_for_stock").value, false);
+    if (paid.blank) need($("paid_for_stock"), "Enter what you paid SOAP for the items.");
+    else if (!paid.ok) need($("paid_for_stock"), "What you paid SOAP for the items is not a dollar amount.");
+  }
+
+  if (!noItems()) {
+    const cards = all(itemsBox, ".item");
+    const seen = {};
+    let real = 0;
+    cards.forEach(function (card, i) {
+      const r = readItem(card);
+      if (r.empty && cards.length > 1) {
+        need(card.querySelector(".it-item"), "Item " + (i + 1) + " is empty. Fill it in or tap Remove.");
+        return;
+      }
+      if (r.empty) return;
+      real++;
+      const label = r.name || ("Item " + (i + 1));
+      if (!r.sel) need(card.querySelector(".it-item"), "Item " + (i + 1) + ": choose what it was.");
+      if (r.sel === OTHER && !r.other) need(card.querySelector(".it-other"), "Item " + (i + 1) + ": type the item name.");
+      if (r.name) {
+        const key = r.name.toLowerCase();
+        if (seen[key]) need(card.querySelector(".it-item"), label + " is listed twice. Put it all on one card.");
+        seen[key] = true;
+      }
+      if (!r.numbersOk) {
+        need(card.querySelector(".it-received"), label + ": use whole numbers for counts and dollars for prices.");
+        return;
+      }
+      if (r.received.blank || r.received.val === 0) need(card.querySelector(".it-received"), label + ": enter how many you received.");
+      r.lines.forEach(function (l) {
+        if (l.qty.val > 0 && l.price.val <= 0) need(l.el.querySelector(".pl-price"), label + ": enter the price each sold at.");
+      });
+      if (r.go.val > 0 && !r.gow) need(card.querySelector(".it-gow"), label + ": say who the others were.");
+      if (!r.received.blank && r.received.val > 0 && !r.addsUp) {
+        need(card.querySelector(".it-left"), label + ": sold, given away and left over add up to " + r.counted + ", not the " + r.received.val + " you received.");
+      }
+    });
+    if (real === 0) need(itemsBox.querySelector(".it-item") || $("add-item"), "Add at least one item, or tick the box that says you had nothing for sale.");
+  }
+
+  t.money.bad.forEach(function (b) { need(b[0], "Money in: " + b[1] + " is not a dollar amount."); });
+  if (t.needReason && !clean($("sales_gap_reason").value)) {
+    need($("sales_gap_reason"), "Money in: your sales do not match your item list. Fix the numbers or say why.");
+  }
+  const cash = t.money.rows.cash;
+  const cashIn = (cash.sales.ok ? cash.sales.val : 0) + (cash.donations.ok ? cash.donations.val : 0);
+  if (cashIn > 0 && !$("cash_sent_how").value) need($("cash_sent_how"), "Money in: say how the cash got to SOAP.");
+  if (!parseNum($("chapter_kept").value, false).ok) need($("chapter_kept"), "Money in: what your chapter kept is not a dollar amount.");
+  ["booth", "supplies", "other"].forEach(function (k) {
+    if (!t.exp[k].ok) need($("exp_" + k), "Expenses: " + (k === "booth" ? "booth fee" : k) + " is not a dollar amount.");
+  });
+  if (t.exp.other.ok && t.exp.other.val > 0) req("exp_other_what", "Expenses: say what the other expense was.");
+
+  req("sold_best", "Say what sold best.");
+  req("sold_worst", "Say what did not sell.");
+  req("asked_for", "Say what people asked for.");
+  req("change_next", "Say one thing to change next time.");
+  ["sent_to_store", "brochures_out"].forEach(function (id) {
+    if (!parseNum($(id).value, true).ok) need($(id), (id === "sent_to_store" ? "Online store" : "Brochures") + ": use a whole number.");
+  });
+  const link = clean($("photos_link").value);
+  if (link && !/^(https?:\/\/)?[^\s.]+\.[^\s]+$/i.test(link)) need($("photos_link"), "Check the photos link.");
+
+  problems.forEach(function (p) {
+    if (p.el && p.el.type !== "radio") { p.el.classList.add("bad-field"); p.el.setAttribute("aria-invalid", "true"); }
+  });
+  return problems;
+}
+
+function showProblems(problems) {
+  const box = $("problems");
+  box.innerHTML = "";
+  if (!problems.length) { box.classList.add("hidden"); return; }
+  const p = document.createElement("p");
+  p.textContent = (problems.length === 1 ? "One thing" : problems.length + " things") + " to fix before this can be sent:";
+  box.appendChild(p);
+  const ul = document.createElement("ul");
+  problems.forEach(function (prob) {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#";
+    a.textContent = prob.msg;
+    a.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      if (prob.el) {
+        prob.el.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(function () { try { prob.el.focus({ preventScroll: true }); } catch (e) {} }, 350);
+      }
+    });
+    li.appendChild(a);
+    ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  box.classList.remove("hidden");
+}
+
+
+
+function buildPayload() {
+  const t = recalc();
+  const chapterSel = $("chapter").value;
+  const items = noItems() ? [] : all(itemsBox, ".item").map(readItem).filter(function (r) { return !r.empty; }).map(function (r) {
+    return {
+      item: r.name,
+      received: r.received.val,
+      lines: r.lines.filter(function (l) { return l.qty.val > 0; }).map(function (l) { return { qty: l.qty.val, price: l.price.val }; }),
+      given_volunteers: r.gv.val,
+      given_donors: r.gd.val,
+      given_other: r.go.val,
+      given_other_who: r.go.val > 0 ? r.gow : "",
+      left_over: r.left.val
+    };
+  });
+  const money = {};
+  METHODS.forEach(function (m) {
+    money[m[0]] = { sales: t.money.rows[m[0]].sales.val, donations: t.money.rows[m[0]].donations.val };
+  });
+  const att = parseNum($("attendance").value, true);
+  const sts = parseNum($("sent_to_store").value, true);
+  const bro = parseNum($("brochures_out").value, true);
+  const paid = parseNum($("paid_for_stock").value, false);
+  const kept = parseNum($("chapter_kept").value, false);
+  let link = clean($("photos_link").value);
+  if (link && !/^https?:\/\//i.test(link)) link = "https://" + link;
+  return {
+    _form: "SOAP Chapter Event Report",
+    _version: FORM_VERSION,
+    report_id: reportId,
+    submitted_at: new Date().toISOString(),
+    chapter: chapterSel === UNLISTED ? clean($("chapter_other").value) : chapterSel,
+    chapter_listed: chapterSel !== UNLISTED,
+    leader_name: clean($("leader_name").value),
+    leader_email: clean($("leader_email").value),
+    event_name: clean($("event_name").value),
+    event_date: clean($("event_date").value),
+    event_city: clean($("event_city").value),
+    event_state: $("event_state").value,
+    event_type: checkedValue("event_type"),
+    event_type_other: checkedValue("event_type") === "Other" ? clean($("event_type_other").value) : "",
+    attendance: att.blank ? "" : att.val,
+    terms: checkedValue("terms"),
+    paid_for_stock: checkedValue("terms") === BOUGHT && !paid.blank ? paid.val : "",
+    no_items: noItems(),
+    items: items,
+    money: money,
+    sales_gap_reason: t.needReason ? clean($("sales_gap_reason").value) : "",
+    cash_sent_how: $("cash_sent_how").value,
+    memo: clean($("memo").value),
+    chapter_kept: kept.blank ? "" : kept.val,
+    expenses: {
+      booth: t.exp.booth.val,
+      supplies: t.exp.supplies.val,
+      other: t.exp.other.val,
+      other_what: t.exp.other.val > 0 ? clean($("exp_other_what").value) : ""
+    },
+    brochures_out: bro.blank ? "" : bro.val,
+    brochures_ran_out: $("brochures_ran_out").checked,
+    sent_to_store: sts.blank ? "" : sts.val,
+    sold_best: clean($("sold_best").value),
+    sold_worst: clean($("sold_worst").value),
+    asked_for: clean($("asked_for").value),
+    change_next: clean($("change_next").value),
+    notes: clean($("notes").value),
+    photos_link: link,
+    photos_ok: $("photos_ok").checked
+  };
+}
+
+function lineDetail(lines) {
+  return lines.map(function (l) { return l.qty + " at " + fmt(l.price); }).join(", ");
+}
+
+function buildText(p) {
+  const L = [];
+  let itemSales = 0, sales = 0, donations = 0;
+  L.push("SOAP CHAPTER EVENT REPORT");
+  L.push("Report ID: " + p.report_id);
+  L.push("");
+  L.push("Chapter: " + p.chapter);
+  L.push("Leader: " + p.leader_name + ", " + p.leader_email);
+  L.push("Event: " + p.event_name);
+  L.push("Date: " + p.event_date);
+  L.push("Where: " + p.event_city + ", " + p.event_state);
+  L.push("Type: " + p.event_type + (p.event_type_other ? " (" + p.event_type_other + ")" : ""));
+  L.push("About how many came: " + (p.attendance === "" ? "not given" : p.attendance));
+  L.push("Items came: " + (p.terms === "Consignment" ? "On consignment from SOAP" : "Bought from SOAP"));
+  if (p.terms === BOUGHT) L.push("Paid SOAP for the items: " + fmt(Number(p.paid_for_stock) || 0));
+  L.push("");
+  L.push("ITEMS");
+  if (!p.items.length) L.push("Nothing for sale at this event.");
+  p.items.forEach(function (it) {
+    const sold = it.lines.reduce(function (a, l) { return a + l.qty; }, 0);
+    const s = cents(it.lines.reduce(function (a, l) { return a + l.qty * l.price; }, 0));
+    const given = it.given_volunteers + it.given_donors + it.given_other;
+    const who = [];
+    if (it.given_volunteers) who.push(it.given_volunteers + " to volunteers");
+    if (it.given_donors) who.push(it.given_donors + " to donors");
+    if (it.given_other) who.push(it.given_other + " to " + (it.given_other_who || "others"));
+    itemSales += s;
+    L.push(it.item + ": received " + it.received + ", sold " + sold + (sold ? " (" + lineDetail(it.lines) + ")" : "") +
+      ", given away " + given + (given ? " (" + who.join(", ") + ")" : "") + ", left over " + it.left_over + ". Sales " + fmt(s));
+  });
+  L.push("Item sales: " + fmt(itemSales));
+  L.push("");
+  L.push("MONEY IN");
+  METHODS.forEach(function (m) {
+    const r = p.money[m[0]];
+    sales += r.sales;
+    donations += r.donations;
+    L.push(m[1] + ": sales " + fmt(r.sales) + ", donations " + fmt(r.donations));
+  });
+  L.push("Total sales: " + fmt(sales));
+  L.push("Total donations: " + fmt(donations));
+  L.push("Money in: " + fmt(sales + donations));
+  if (p.sales_gap_reason) L.push("Why sales differ from the item list: " + p.sales_gap_reason);
+  L.push("Cash got to SOAP: " + (p.cash_sent_how || "not given"));
+  if (p.chapter_kept !== "") L.push("Kept by the chapter: " + fmt(Number(p.chapter_kept) || 0));
+  if (p.memo) L.push("Memo used: " + p.memo);
+  L.push("");
+  L.push("EXPENSES");
+  L.push("Booth fee " + fmt(p.expenses.booth) + ", supplies " + fmt(p.expenses.supplies) + ", other " + fmt(p.expenses.other) +
+    (p.expenses.other_what ? " (" + p.expenses.other_what + ")" : ""));
+  L.push("Total expenses: " + fmt(p.expenses.booth + p.expenses.supplies + p.expenses.other));
+  L.push("");
+  L.push("HOW IT WENT");
+  L.push("Sold best: " + p.sold_best);
+  L.push("Did not sell: " + p.sold_worst);
+  L.push("People asked for: " + p.asked_for);
+  L.push("Change next time: " + p.change_next);
+  L.push("Sent to the online store: " + (p.sent_to_store === "" ? "not given" : p.sent_to_store));
+  L.push("Brochures handed out: " + (p.brochures_out === "" ? "not given" : p.brochures_out) + (p.brochures_ran_out ? ", and we ran out" : ""));
+  if (p.notes) L.push("Anything else: " + p.notes);
+  L.push("");
+  L.push("PHOTOS");
+  L.push("Link: " + (p.photos_link || "none"));
+  L.push("SOAP may share them on social media: " + (p.photos_ok ? "Yes" : "No"));
+  return L.join("\n");
+}
+
+
+
+async function postReport(payload) {
+  if (!WEB_APP_URL || WEB_APP_URL.indexOf("/exec") === -1) return { ok: false, why: "no address" };
+  const controller = new AbortController();
+  const timer = setTimeout(function () { controller.abort(); }, SUBMIT_TIMEOUT_MS);
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    if (!res.ok) return { ok: false, why: "status " + res.status };
+    const text = await res.text();
+    let reply;
+    try { reply = JSON.parse(text); } catch (e) { return { ok: false, why: "not json" }; }
+    if (!reply || reply.ok !== true) return { ok: false, why: "refused" };
+    return { ok: true, reportId: clean(reply.reportId) || payload.report_id };
+  } catch (err) {
+    return { ok: false, why: err && err.name === "AbortError" ? "timeout" : "network" };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function showFallback(payload) {
+  const text = buildText(payload);
+  const subject = "Chapter event report: " + payload.chapter + ", " + payload.event_name + ", " + payload.event_date;
+  $("fallback-mail").href = "mailto:" + SOAP_EMAIL + "?subject=" + encodeURIComponent(subject) +
+    "&body=" + encodeURIComponent(text.replace(/\n/g, "\r\n"));
+  $("fallback-addr").href = "mailto:" + SOAP_EMAIL;
+  $("fallback-text").value = text;
+  $("done").classList.add("hidden");
+  $("fallback").classList.remove("hidden");
+  $("fallback").scrollIntoView({ behavior: "smooth", block: "start" });
+  try { $("fallback").focus({ preventScroll: true }); } catch (e) {}
+}
+
+function showSuccess(payload, id) {
+  $("done-event").textContent = payload.event_name + ", " + payload.event_date;
+  $("done-id").textContent = id;
+  $("done-text").value = buildText(payload);
+  $("fallback").classList.add("hidden");
+  $("report").classList.add("hidden");
+  $("bar").classList.add("hidden");
+  $("draft-banner").classList.add("hidden");
+  $("done").classList.remove("hidden");
+  clearDraft();
+  window.scrollTo(0, 0);
+  try { $("done").focus({ preventScroll: true }); } catch (e) {}
+}
+
+async function onSubmit(ev) {
+  ev.preventDefault();
+  const problems = validate();
+  showProblems(problems);
+  if (problems.length) {
+    $("problems").scrollIntoView({ behavior: "smooth", block: "center" });
+    try { $("problems").focus({ preventScroll: true }); } catch (e) {}
+    return;
+  }
+  if (!reportId) { reportId = newReportId(); saveDraft(); }
+  const payload = buildPayload();
+  const btn = $("send");
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+  let result = { ok: false };
+  try { result = await postReport(payload); } catch (e) { result = { ok: false }; }
+  btn.disabled = false;
+  btn.textContent = "Send report to SOAP";
+  if (result.ok) showSuccess(payload, result.reportId);
+  else showFallback(payload);
+}
+
+
+
+function fieldEls() {
+  return all($("report"), "input[name], select[name], textarea[name]");
+}
+
+function saveDraft() {
+  if ($("report").classList.contains("hidden")) return;
+  try {
+    const fields = {};
+    fieldEls().forEach(function (el) {
+      if (el.type === "radio") { if (el.checked) fields[el.name] = el.value; }
+      else if (el.type === "checkbox") fields[el.name] = el.checked;
+      else fields[el.name] = el.value;
+    });
+    METHODS.forEach(function (m) {
+      fields["m_" + m[0] + "_sales"] = $("m_" + m[0] + "_sales").value;
+      fields["m_" + m[0] + "_donations"] = $("m_" + m[0] + "_donations").value;
+    });
+    const items = all(itemsBox, ".item").map(function (card) {
+      return {
+        sel: card.querySelector(".it-item").value,
+        other: card.querySelector(".it-other").value,
+        received: card.querySelector(".it-received").value,
+        lines: all(card, ".line").map(function (l) {
+          return { qty: l.querySelector(".pl-qty").value, price: l.querySelector(".pl-price").value };
+        }),
+        gv: card.querySelector(".it-gv").value,
+        gd: card.querySelector(".it-gd").value,
+        go: card.querySelector(".it-go").value,
+        gow: card.querySelector(".it-gow").value,
+        left: card.querySelector(".it-left").value
+      };
+    });
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ savedAt: Date.now(), reportId: reportId, fields: fields, items: items }));
+  } catch (e) {  }
+}
+
+function clearDraft() {
+  clearTimeout(saveTimer);
+  try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+}
+
+function restoreDraft() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (e) { d = null; }
+  if (!d || !d.fields) return false;
+  const f = d.fields;
+  fieldEls().forEach(function (el) {
+    if (!(el.name in f)) return;
+    if (el.type === "radio") el.checked = (f[el.name] === el.value);
+    else if (el.type === "checkbox") el.checked = !!f[el.name];
+    else el.value = f[el.name];
+  });
+  METHODS.forEach(function (m) {
+    $("m_" + m[0] + "_sales").value = f["m_" + m[0] + "_sales"] || "";
+    $("m_" + m[0] + "_donations").value = f["m_" + m[0] + "_donations"] || "";
+  });
+  (d.items && d.items.length ? d.items : [null]).forEach(function (it) { addItem(it); });
+  reportId = d.reportId || "";
+  const when = new Date(d.savedAt);
+  $("draft-text").textContent = "We kept the report you started " +
+    when.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) + " at " +
+    when.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) + ".";
+  $("draft-banner").classList.remove("hidden");
+  return true;
+}
+
+function resetAll() {
+  clearDraft();
+  $("report").reset();
+  itemsBox.innerHTML = "";
+  addItem();
+  reportId = "";
+  showProblems([]);
+  all(document, ".bad-field").forEach(function (el) { el.classList.remove("bad-field"); });
+  ["fallback", "done", "draft-banner"].forEach(function (id) { $(id).classList.add("hidden"); });
+  $("report").classList.remove("hidden");
+  $("bar").classList.remove("hidden");
+  recalc();
+  window.scrollTo(0, 0);
+}
+
+let saveTimer = null;
+function changed() {
+  recalc();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveDraft, 300);
+}
+
+
+
+$("event_date").max = todayISO();
+$("report").addEventListener("input", changed);
+$("report").addEventListener("change", changed);
+$("report").addEventListener("submit", onSubmit);
+$("add-item").addEventListener("click", function () {
+  const card = addItem();
+  changed();
+  card.querySelector(".it-item").focus();
+});
+$("draft-clear").addEventListener("click", function () {
+  if (window.confirm("Clear everything on this report and start over?")) resetAll();
+});
+$("done-new").addEventListener("click", resetAll);
+$("fallback-done").addEventListener("click", function () {
+  if (window.confirm("Only clear it if the email went to SOAP. Clear this report now?")) resetAll();
+});
+$("fallback-copy").addEventListener("click", async function () {
+  const box = $("fallback-text");
+  const btn = this;
+  try {
+    await navigator.clipboard.writeText(box.value);
+    btn.textContent = "Copied";
+  } catch (e) {
+    box.focus();
+    box.select();
+    btn.textContent = "Selected. Now copy it.";
+  }
+});
+
+if (!restoreDraft()) addItem();
+recalc();
+</script>
+</body>
+</html>
